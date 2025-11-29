@@ -29,6 +29,34 @@ struct ControlButton: View {
     }
 }
 
+// MARK: - Key Badge (отображение тональности)
+
+struct KeyBadgeView: View {
+    let key: String
+    
+    var body: some View {
+        VStack(spacing: 2) {
+            Text("Key")
+                .font(.system(size: 9))
+                .foregroundColor(.gray)
+            
+            Text(key)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(.cyan)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.white.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.cyan.opacity(0.3), lineWidth: 1)
+                )
+        )
+    }
+}
+
 // MARK: - View Mode Picker
 
 struct ViewModePicker: View {

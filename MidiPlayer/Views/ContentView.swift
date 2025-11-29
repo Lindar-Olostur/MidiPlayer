@@ -30,7 +30,7 @@ enum ViewMode: String, CaseIterable {
 
 struct ContentView: View {
     @State private var sequencer = MIDISequencer()
-    @State private var sourceType: SourceType = .abc
+    @State private var sourceType: SourceType = .midi
     @State private var viewMode: ViewMode = .fingerChart
     @State private var whistleKey: WhistleKey = .D_high
     
@@ -144,6 +144,9 @@ struct ContentView: View {
                         sequencer.loadTune(at: index)
                     }
                 )
+            } else if sourceType == .midi {
+                // Показываем определённую тональность для MIDI
+                KeyBadgeView(key: currentTuneKey)
             }
             
             Spacer()
@@ -350,8 +353,11 @@ struct ContentView: View {
     private var currentTuneKey: String {
         if sourceType == .abc && !sequencer.abcTunes.isEmpty {
             return sequencer.abcTunes[sequencer.selectedTuneIndex].key
+        } else if sourceType == .midi, let midiInfo = sequencer.midiInfo {
+            // Анализируем ноты MIDI для определения тональности
+            return KeyDetector.detectKey(from: midiInfo.allNotes)
         }
-        return "D"
+        return "C"
     }
     
     // MARK: - Methods
