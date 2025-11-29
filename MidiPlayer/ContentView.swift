@@ -12,9 +12,22 @@ enum SourceType: String, CaseIterable {
     case abc = "ABC"
 }
 
+enum ViewMode: String, CaseIterable {
+    case pianoRoll = "Piano Roll"
+    case fingerChart = "Fingering"
+    
+    var icon: String {
+        switch self {
+        case .pianoRoll: return "pianokeys"
+        case .fingerChart: return "hand.raised.fingers.spread"
+        }
+    }
+}
+
 struct ContentView: View {
     @State private var sequencer = MIDISequencer()
     @State private var sourceType: SourceType = .abc
+    @State private var viewMode: ViewMode = .pianoRoll
     
     var body: some View {
         ZStack {
@@ -84,17 +97,35 @@ struct ContentView: View {
                     .padding(.horizontal, 20)
                 }
                 
-                // Piano Roll
+                // Переключатель режима отображения
+                ViewModePicker(viewMode: $viewMode)
+                    .padding(.horizontal, 20)
+                
+                // Piano Roll или Аппликатуры
                 if let midiInfo = sequencer.midiInfo {
-                    PianoRollView(
-                        midiInfo: midiInfo,
-                        currentBeat: sequencer.currentBeat,
-                        startMeasure: sequencer.startMeasure,
-                        endMeasure: sequencer.endMeasure,
-                        isPlaying: sequencer.isPlaying
-                    )
-                    .frame(height: 220)
-                    .padding(.horizontal, 12)
+                    switch viewMode {
+                    case .pianoRoll:
+                        PianoRollView(
+                            midiInfo: midiInfo,
+                            currentBeat: sequencer.currentBeat,
+                            startMeasure: sequencer.startMeasure,
+                            endMeasure: sequencer.endMeasure,
+                            isPlaying: sequencer.isPlaying
+                        )
+                        .frame(height: 220)
+                        .padding(.horizontal, 12)
+                        
+                    case .fingerChart:
+                        FingerChartView(
+                            midiInfo: midiInfo,
+                            currentBeat: sequencer.currentBeat,
+                            startMeasure: sequencer.startMeasure,
+                            endMeasure: sequencer.endMeasure,
+                            isPlaying: sequencer.isPlaying
+                        )
+                        .frame(height: 220)
+                        .padding(.horizontal, 12)
+                    }
                 } else {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color.white.opacity(0.05))
@@ -341,6 +372,58 @@ struct ControlButton: View {
                     .foregroundColor(.white.opacity(0.9))
             }
         }
+    }
+}
+
+// MARK: - View Mode Picker
+
+struct ViewModePicker: View {
+    @Binding var viewMode: ViewMode
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(ViewMode.allCases, id: \.self) { mode in
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        viewMode = mode
+                    }
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: mode.icon)
+                            .font(.system(size: 12))
+                        
+                        Text(mode.rawValue)
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundColor(viewMode == mode ? .white : .gray)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(viewMode == mode 
+                                  ? LinearGradient(
+                                        colors: [
+                                            Color(red: 0.5, green: 0.3, blue: 0.7),
+                                            Color(red: 0.3, green: 0.5, blue: 0.7)
+                                        ],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                  : LinearGradient(
+                                        colors: [Color.clear],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                            )
+                    )
+                }
+            }
+        }
+        .padding(4)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.white.opacity(0.05))
+        )
     }
 }
 
