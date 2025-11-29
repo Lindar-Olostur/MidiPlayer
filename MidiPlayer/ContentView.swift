@@ -27,7 +27,8 @@ enum ViewMode: String, CaseIterable {
 struct ContentView: View {
     @State private var sequencer = MIDISequencer()
     @State private var sourceType: SourceType = .abc
-    @State private var viewMode: ViewMode = .pianoRoll
+    @State private var viewMode: ViewMode = .fingerChart
+    @State private var whistleKey: WhistleKey = .D_high
     
     var body: some View {
         ZStack {
@@ -84,18 +85,25 @@ struct ContentView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 10)
                 
-                // Выбор мелодии для ABC
-                if sourceType == .abc && !sequencer.abcTunes.isEmpty {
-                    TuneSelectorView(
-                        tunes: sequencer.abcTunes,
-                        selectedIndex: $sequencer.selectedTuneIndex,
-                        onSelect: { index in
-                            sequencer.stop()
-                            sequencer.loadTune(at: index)
-                        }
-                    )
-                    .padding(.horizontal, 20)
+                // Выбор мелодии для ABC и строй вистла
+                HStack(spacing: 12) {
+                    if sourceType == .abc && !sequencer.abcTunes.isEmpty {
+                        TuneSelectorView(
+                            tunes: sequencer.abcTunes,
+                            selectedIndex: $sequencer.selectedTuneIndex,
+                            onSelect: { index in
+                                sequencer.stop()
+                                sequencer.loadTune(at: index)
+                            }
+                        )
+                    }
+                    
+                    Spacer()
+                    
+                    // Выбор строя вистла
+                    WhistleKeyPicker(whistleKey: $whistleKey)
                 }
+                .padding(.horizontal, 20)
                 
                 // Переключатель режима отображения
                 ViewModePicker(viewMode: $viewMode)
@@ -121,7 +129,8 @@ struct ContentView: View {
                             currentBeat: sequencer.currentBeat,
                             startMeasure: sequencer.startMeasure,
                             endMeasure: sequencer.endMeasure,
-                            isPlaying: sequencer.isPlaying
+                            isPlaying: sequencer.isPlaying,
+                            tuneKey: currentTuneKey
                         )
                         .frame(height: 220)
                         .padding(.horizontal, 12)
@@ -207,7 +216,10 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity)
                     
                     // Транспонирование
-                    TransposeControl(transpose: $sequencer.transpose)
+                    TransposeControl(
+                        transpose: $sequencer.transpose,
+                        originalKey: currentTuneKey
+                    )
                 }
                 .padding(.horizontal, 20)
                 
@@ -283,6 +295,9 @@ struct ContentView: View {
         .onAppear {
             loadSource(sourceType)
         }
+        .onChange(of: sequencer.selectedTuneIndex) { _, _ in
+            updateWhistleKeyFromTune()
+        }
     }
     
     private var currentMeasure: Int {
@@ -299,6 +314,13 @@ struct ContentView: View {
         return nil
     }
     
+    private var currentTuneKey: String {
+        if sourceType == .abc && !sequencer.abcTunes.isEmpty {
+            return sequencer.abcTunes[sequencer.selectedTuneIndex].key
+        }
+        return "D"
+    }
+    
     private func loadSource(_ source: SourceType) {
         sequencer.stop()
         switch source {
@@ -306,6 +328,73 @@ struct ContentView: View {
             sequencer.loadMIDIFile(named: "silverspear")
         case .abc:
             sequencer.loadABCFile(named: "silverspear")
+        }
+        // Устанавливаем строй вистла по тональности мелодии
+        updateWhistleKeyFromTune()
+    }
+    
+    private func updateWhistleKeyFromTune() {
+        let key = currentTuneKey
+        whistleKey = whistleKeyFromTuneKey(key)
+    }
+    
+    /// Преобразует тональность мелодии в строй вистла
+    private func whistleKeyFromTuneKey(_ tuneKey: String) -> WhistleKey {
+        let key = tuneKey.trimmingCharacters(in: .whitespaces).uppercased()
+        
+        // Извлекаем основную ноту
+        guard !key.isEmpty else { return .D_high }
+        
+        let firstChar = key.prefix(1)
+        var noteName = String(firstChar)
+        
+        // Проверяем модификатор (# или b)
+        if key.count >= 2 {
+            let second = key[key.index(key.startIndex, offsetBy: 1)]
+            if second == "#" {
+                noteName += "#"
+            } else if second == "B" && key.prefix(2) != "BB" {
+                // Это может быть Bb или просто B
+                if key.hasPrefix("BB") || key.hasPrefix("BM") {
+                    noteName = "B"
+                }
+            }
+        }
+        
+        // Особые случаи: Ador, Edor, Bm и т.д. - миксолидийские/дорийские лады
+        if key.contains("DOR") || key.contains("MIN") || key.contains("M") {
+            // Для дорийского лада обычно играют на вистле на тон ниже
+            // A дорийский → G вистл, E дорийский → D вистл, B минор → A вистл
+        }
+        
+        // Сопоставляем с WhistleKey
+        switch noteName {
+        case "EB", "E♭":
+            return .Eb
+        case "D":
+            return .D_high
+        case "C#", "DB", "D♭":
+            return .Csharp
+        case "C":
+            return .C
+        case "B":
+            return .B
+        case "BB", "B♭", "A#":
+            return .Bb
+        case "A":
+            return .A
+        case "AB", "A♭", "G#":
+            return .Ab
+        case "G":
+            return .G
+        case "F#", "GB", "G♭":
+            return .Fsharp
+        case "F":
+            return .F
+        case "E":
+            return .E
+        default:
+            return .D_high
         }
     }
 }
@@ -431,6 +520,7 @@ struct ViewModePicker: View {
 
 struct TransposeControl: View {
     @Binding var transpose: Int
+    let originalKey: String
     
     private let semitoneNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
     
@@ -462,7 +552,7 @@ struct TransposeControl: View {
                         .font(.system(size: 9))
                         .foregroundColor(.gray)
                 }
-                .frame(width: 44)
+                .frame(width: 50)
                 
                 // Кнопка плюс
                 Button(action: {
@@ -485,10 +575,98 @@ struct TransposeControl: View {
     }
     
     private var transposeKeyName: String {
-        // Показываем название ноты относительно D (типичная тональность для рилов)
-        let baseNote = 2 // D
-        let newNote = (baseNote + transpose + 12) % 12
-        return "D → \(semitoneNames[newNote])"
+        // Получаем базовую ноту из тональности мелодии
+        let baseNoteName = extractNoteName(from: originalKey)
+        let baseNoteIndex = semitoneNames.firstIndex(of: baseNoteName) ?? 2
+        let newNote = (baseNoteIndex + transpose + 12) % 12
+        
+        if transpose == 0 {
+            return baseNoteName
+        }
+        return "\(baseNoteName) → \(semitoneNames[newNote])"
+    }
+    
+    /// Извлекает название ноты из тональности (например "Cmaj" → "C", "Ador" → "A")
+    private func extractNoteName(from key: String) -> String {
+        let key = key.trimmingCharacters(in: .whitespaces)
+        guard !key.isEmpty else { return "D" }
+        
+        let firstChar = String(key.prefix(1)).uppercased()
+        
+        // Проверяем второй символ на # или b
+        if key.count >= 2 {
+            let secondChar = key[key.index(key.startIndex, offsetBy: 1)]
+            if secondChar == "#" {
+                return firstChar + "#"
+            } else if secondChar == "b" {
+                // Преобразуем бемоль в диез для упрощения
+                switch firstChar {
+                case "D": return "C#"
+                case "E": return "D#"
+                case "G": return "F#"
+                case "A": return "G#"
+                case "B": return "A#"
+                default: return firstChar
+                }
+            }
+        }
+        
+        return firstChar
+    }
+}
+
+// MARK: - Whistle Key Picker
+
+struct WhistleKeyPicker: View {
+    @Binding var whistleKey: WhistleKey
+    
+    var body: some View {
+        HStack(spacing: 6) {
+            // Кнопка назад (к более высокому)
+            Button(action: {
+                let keys = WhistleKey.allCases
+                if let index = keys.firstIndex(of: whistleKey), index > 0 {
+                    whistleKey = keys[index - 1]
+                }
+            }) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.cyan.opacity(0.7))
+            }
+            
+            // Текущий строй
+            VStack(spacing: 0) {
+                Text(whistleKey.displayName)
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(.cyan)
+                Text("whistle")
+                    .font(.system(size: 8))
+                    .foregroundColor(.gray)
+            }
+            .frame(minWidth: 50)
+            
+            // Кнопка вперёд (к более низкому)
+            Button(action: {
+                let keys = WhistleKey.allCases
+                if let index = keys.firstIndex(of: whistleKey), index < keys.count - 1 {
+                    whistleKey = keys[index + 1]
+                }
+            }) {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.cyan.opacity(0.7))
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.white.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.cyan.opacity(0.2), lineWidth: 1)
+                )
+        )
     }
 }
 

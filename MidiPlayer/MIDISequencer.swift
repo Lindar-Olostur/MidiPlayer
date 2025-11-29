@@ -195,6 +195,10 @@ class MIDISequencer {
         let wasPlaying = isPlaying
         let currentPos = currentBeat
         
+        // Сохраняем выделенную область
+        let savedStartMeasure = startMeasure
+        let savedEndMeasure = endMeasure
+        
         if wasPlaying {
             pause()
         }
@@ -202,6 +206,10 @@ class MIDISequencer {
         if !abcTunes.isEmpty {
             loadTune(at: selectedTuneIndex)
         }
+        
+        // Восстанавливаем выделенную область
+        startMeasure = min(savedStartMeasure, totalMeasures)
+        endMeasure = min(savedEndMeasure, totalMeasures)
         
         // Восстанавливаем позицию
         if currentPos > 0 {
