@@ -135,24 +135,9 @@ struct ContentView: View {
     
     private var tuneAndWhistleSection: some View {
         HStack(spacing: 12) {
-            if sourceType == .abc && !sequencer.abcTunes.isEmpty {
-                TuneSelectorView(
-                    tunes: sequencer.abcTunes,
-                    selectedIndex: $sequencer.selectedTuneIndex,
-                    onSelect: { index in
-                        sequencer.stop()
-                        sequencer.loadTune(at: index)
-                    }
-                )
-            } else if sourceType == .midi {
-                // Показываем определённую тональность для MIDI
-                KeyBadgeView(key: currentTuneKey)
-            }
-            
-            Spacer()
-            
             // Выбор строя вистла
             WhistleKeyPicker(whistleKey: $whistleKey)
+            Spacer()
         }
         .padding(.horizontal, 20)
     }
@@ -351,10 +336,8 @@ struct ContentView: View {
     }
     
     private var currentTuneKey: String {
-        if sourceType == .abc && !sequencer.abcTunes.isEmpty {
-            return sequencer.abcTunes[sequencer.selectedTuneIndex].key
-        } else if sourceType == .midi, let midiInfo = sequencer.midiInfo {
-            // Анализируем ноты MIDI для определения тональности
+        // Всегда используем KeyDetector для анализа нот (и для ABC, и для MIDI)
+        if let midiInfo = sequencer.midiInfo {
             return KeyDetector.detectKey(from: midiInfo.allNotes)
         }
         return "C"

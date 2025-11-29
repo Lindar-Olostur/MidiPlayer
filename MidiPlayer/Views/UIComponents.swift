@@ -29,34 +29,6 @@ struct ControlButton: View {
     }
 }
 
-// MARK: - Key Badge (отображение тональности)
-
-struct KeyBadgeView: View {
-    let key: String
-    
-    var body: some View {
-        VStack(spacing: 2) {
-            Text("Key")
-                .font(.system(size: 9))
-                .foregroundColor(.gray)
-            
-            Text(key)
-                .font(.system(size: 14, weight: .bold))
-                .foregroundColor(.cyan)
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.white.opacity(0.08))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.cyan.opacity(0.3), lineWidth: 1)
-                )
-        )
-    }
-}
-
 // MARK: - View Mode Picker
 
 struct ViewModePicker: View {
@@ -164,51 +136,6 @@ struct WhistleKeyPicker: View {
     }
 }
 
-// MARK: - Tune Selector
-
-struct TuneSelectorView: View {
-    let tunes: [ABCTune]
-    @Binding var selectedIndex: Int
-    let onSelect: (Int) -> Void
-    
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(Array(tunes.enumerated()), id: \.element.id) { index, tune in
-                    Button(action: {
-                        selectedIndex = index
-                        onSelect(index)
-                    }) {
-                        VStack(spacing: 2) {
-                            Text("#\(tune.id)")
-                                .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                .foregroundColor(selectedIndex == index ? .white : .gray)
-                            
-                            Text(tune.key)
-                                .font(.system(size: 10))
-                                .foregroundColor(selectedIndex == index ? .cyan : .gray.opacity(0.7))
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(selectedIndex == index
-                                      ? Color.purple.opacity(0.3)
-                                      : Color.white.opacity(0.05))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(selectedIndex == index
-                                                ? Color.purple.opacity(0.5)
-                                                : Color.clear, lineWidth: 1)
-                                )
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
 // MARK: - Transpose Control
 
 struct TransposeControl: View {
@@ -241,11 +168,11 @@ struct TransposeControl: View {
                         .font(.system(size: 16, weight: .bold, design: .monospaced))
                         .foregroundColor(transpose == 0 ? .white : .orange)
                     
-                    Text(transposeKeyName)
+                    Text(currentKeyDisplay)
                         .font(.system(size: 9))
                         .foregroundColor(.gray)
                 }
-                .frame(width: 50)
+                .frame(width: 60)
                 
                 // Кнопка плюс
                 Button(action: {
@@ -267,22 +194,40 @@ struct TransposeControl: View {
         )
     }
     
-    private var transposeKeyName: String {
-        // Получаем базовую ноту из тональности мелодии
+    private var currentKeyDisplay: String {
+        // Определяем является ли тональность минорной
+        let isMinor = originalKey.lowercased().hasSuffix("m") || originalKey.lowercased().hasSuffix("min")
         let baseNoteName = extractNoteName(from: originalKey)
-        let baseNoteIndex = semitoneNames.firstIndex(of: baseNoteName) ?? 2
-        let newNote = (baseNoteIndex + transpose + 12) % 12
+        let baseNoteIndex = semitoneNames.firstIndex(of: baseNoteName) ?? 0
+        let newNoteIndex = (baseNoteIndex + transpose + 12) % 12
+        let newNoteName = semitoneNames[newNoteIndex]
         
         if transpose == 0 {
-            return baseNoteName
+            // Показываем исходную тональность
+            return originalKey
+        } else {
+            // Показываем транспонированную тональность
+            let minorSuffix = isMinor ? "m" : ""
+            return "\(newNoteName)\(minorSuffix)"
         }
-        return "\(baseNoteName) → \(semitoneNames[newNote])"
     }
     
-    /// Извлекает название ноты из тональности (например "Cmaj" → "C", "Ador" → "A")
+    /// Извлекает название ноты из тональности (например "Cmaj" → "C", "Am" → "A", "Ador" → "A")
     private func extractNoteName(from key: String) -> String {
-        let key = key.trimmingCharacters(in: .whitespaces)
-        guard !key.isEmpty else { return "D" }
+        var key = key.trimmingCharacters(in: .whitespaces)
+        guard !key.isEmpty else { return "C" }
+        
+        // Убираем суффиксы (m, min, maj, dor, и т.д.)
+        let suffixes = ["m", "min", "maj", "dor", "phr", "lyd", "mix", "loc"]
+        for suffix in suffixes {
+            if key.lowercased().hasSuffix(suffix) {
+                key = String(key.dropLast(suffix.count))
+                break
+            }
+        }
+        key = key.trimmingCharacters(in: .whitespaces)
+        
+        guard !key.isEmpty else { return "C" }
         
         let firstChar = String(key.prefix(1)).uppercased()
         
@@ -291,7 +236,7 @@ struct TransposeControl: View {
             let secondChar = key[key.index(key.startIndex, offsetBy: 1)]
             if secondChar == "#" {
                 return firstChar + "#"
-            } else if secondChar == "b" {
+            } else if secondChar == "b" || secondChar == "♭" {
                 // Преобразуем бемоль в диез для упрощения
                 switch firstChar {
                 case "D": return "C#"
