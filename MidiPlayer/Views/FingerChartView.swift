@@ -228,72 +228,88 @@ struct FingeringRowView: View {
     let isPlaying: Bool
     let whistleKey: WhistleKey
     
+    private let symbolRowHeight: CGFloat = 20  // Высота ряда с плюсиками и курсором
+    
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            // Белый фон для аппликатур
-            Color.white
-            
-            // Аппликатуры для каждой ноты
-            ForEach(notes) { note in
-                let x = CGFloat(note.startBeat - startBeatOffset) * beatWidth
-                let width = max(CGFloat(note.duration) * beatWidth, 40)
-                let isActive = currentBeat >= note.startBeat && currentBeat < note.endBeat
+        VStack(spacing: 0) {
+            // Верхний ряд: аппликатуры
+            ZStack(alignment: .topLeading) {
+                Color.white
                 
-                FingeringNoteView(
-                    note: note,
-                    isActive: isActive,
-                    width: width,
-                    whistleKey: whistleKey
-                )
-                .frame(width: width, height: rowHeight - 4)
-                .offset(x: x, y: 2)
+                ForEach(notes) { note in
+                    let x = CGFloat(note.startBeat - startBeatOffset) * beatWidth
+                    let width = max(CGFloat(note.duration) * beatWidth, 40)
+                    
+                    FingeringImageView(
+                        note: note,
+                        width: width,
+                        whistleKey: whistleKey
+                    )
+                    .frame(width: width, height: rowHeight - symbolRowHeight - 8)
+                    .offset(x: x, y: 4)
+                }
             }
+            .frame(width: totalWidth, height: rowHeight - symbolRowHeight)
             
-            // Курсор воспроизведения
-            if isPlaying || currentBeat > startBeatOffset {
-                let cursorX = CGFloat(currentBeat - startBeatOffset) * beatWidth
-                Rectangle()
-                    .fill(Color.red.opacity(0.9))
-                    .frame(width: 2, height: rowHeight)
-                    .offset(x: cursorX)
+            // Нижний ряд: индикаторы активности и плюсики
+            ZStack(alignment: .topLeading) {
+                Color(white: 1)
+                
+                ForEach(notes) { note in
+                    let x = CGFloat(note.startBeat - startBeatOffset) * beatWidth
+                    let isActive = currentBeat >= note.startBeat && currentBeat < note.endBeat
+                    
+                    // Индикатор активности - плавное свечение TODO
+//                    RoundedRectangle(cornerRadius: 2)
+//                        .fill(Color.orange)
+//                        .frame(width: 20, height: 4)
+//                        .shadow(color: Color.orange.opacity(isActive ? 0.6 : 0), radius: 4, y: 0)
+//                        .offset(x: x - 6, y: symbolRowHeight - 6)
+//                        .opacity(isActive ? 1 : 0)
+//                        .animation(.easeInOut(duration: 0.2), value: isActive)
+//                    
+                    // Плюсик для передува (кроме VII и ♭VII)
+                    if let fingering = WhistleConverter.pitchToFingering(note.pitch, whistleKey: whistleKey),
+                       fingering.needsOverblow,
+                       fingering.degree != .VII && fingering.degree != .flatVII {
+                        Text("+")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.black.opacity(0.7))
+                            .offset(x: x - 1, y: -4)
+                    }
+                }
             }
+            .frame(width: totalWidth, height: symbolRowHeight)
         }
-        .frame(width: totalWidth)
         .offset(x: -offset)
     }
 }
 
-// MARK: - Fingering Note View
+// MARK: - Fingering Image View
 
-struct FingeringNoteView: View {
+struct FingeringImageView: View {
     let note: MIDINote
-    let isActive: Bool
     let width: CGFloat
     let whistleKey: WhistleKey
     
     var body: some View {
-        if let degree = WhistleConverter.pitchToDegree(note.pitch, whistleKey: whistleKey) {
-            VStack(spacing: 1) {
-                Image(degree.imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxHeight: 48)
-                
-                Text(degree.rawValue)
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundColor(isActive ? .orange : .black.opacity(0.7))
-            }
-            .padding(.horizontal, 2)
+        if let fingering = WhistleConverter.pitchToFingering(note.pitch, whistleKey: whistleKey) {
+            // Используем картинку первой октавы для всех нот
+            Image(fingering.degree.imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity, alignment: .leading)
         } else {
-            // Неизвестная нота
-            VStack(spacing: 2) {
+            // Неизвестная нота (хроматическая)
+            VStack(spacing: 1) {
                 Text("?")
-                    .font(.title2)
+                    .font(.system(size: 18, weight: .medium))
                     .foregroundColor(.gray)
                 Text(WhistleConverter.pitchToNoteName(note.pitch))
-                    .font(.system(size: 8))
-                    .foregroundColor(.gray.opacity(0.7))
+                    .font(.system(size: 7))
+                    .foregroundColor(.gray.opacity(0.6))
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }

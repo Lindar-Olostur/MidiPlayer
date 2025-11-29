@@ -95,7 +95,7 @@ struct ContentView: View {
     private var headerSection: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("MIDI Sequencer")
+                Text("Whistly")
                     .font(.system(size: 24, weight: .heavy, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(
@@ -362,10 +362,10 @@ struct ContentView: View {
         case .midi:
             sequencer.loadMIDIFile(named: "silverspear")
         case .abc:
-            sequencer.loadABCFile(named: "silverspear")
+            sequencer.loadABCFile(named: "ievanpolkka")//TODO 
         }
         // Устанавливаем строй вистла по тональности мелодии
-        updateWhistleKeyFromTune()
+        // TODO  updateWhistleKeyFromTune()
     }
     
     private func updateWhistleKeyFromTune() {

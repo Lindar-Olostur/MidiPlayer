@@ -51,6 +51,64 @@ class ABCParser {
         "Ab": ["B", "E", "A", "D"],
     ]
     
+    /// Относительные минорные тональности (минор → его параллельный мажор)
+    /// Am → C, Em → G, Bm → D, и т.д.
+    private static let relativeMinorToMajor: [String: String] = [
+        "A": "C", "E": "G", "B": "D", "F#": "A", "C#": "E", "G#": "B",
+        "D": "F", "G": "Bb", "C": "Eb", "F": "Ab"
+    ]
+    
+    /// Дорийские лады → эквивалентный мажор (на тон выше)
+    /// Ador → G (те же знаки), Edor → A, Ddor → C, и т.д.
+    private static let dorianToMajor: [String: String] = [
+        "A": "G", "E": "D", "B": "A", "F#": "E", "C#": "B",
+        "D": "C", "G": "F", "C": "Bb"
+    ]
+    
+    /// Определяет ключевые знаки для любой тональности (мажор, минор, лады)
+    private static func getKeySignature(for key: String) -> (sharps: Set<Character>, flats: Set<Character>) {
+        let keyTrimmed = key.trimmingCharacters(in: .whitespaces)
+        
+        // Проверяем модальные тональности (Ador, Edor, Amix, и т.д.)
+        let modes = ["dor", "phr", "lyd", "mix", "loc", "m", "min"]
+        var baseNote = keyTrimmed
+        var isMinor = false
+        var isDorian = false
+        
+        for mode in modes {
+            if keyTrimmed.lowercased().hasSuffix(mode) {
+                baseNote = String(keyTrimmed.dropLast(mode.count))
+                if mode == "m" || mode == "min" {
+                    isMinor = true
+                } else if mode == "dor" {
+                    isDorian = true
+                }
+                break
+            }
+        }
+        
+        // Убираем "maj" если есть
+        baseNote = baseNote.replacingOccurrences(of: "maj", with: "")
+                          .trimmingCharacters(in: .whitespaces)
+        
+        // Определяем эквивалентный мажор
+        var majorKey = baseNote
+        
+        if isMinor {
+            // Минор → параллельный мажор
+            majorKey = relativeMinorToMajor[baseNote] ?? baseNote
+        } else if isDorian {
+            // Дориан → соответствующий мажор
+            majorKey = dorianToMajor[baseNote] ?? baseNote
+        }
+        
+        // Получаем знаки для мажорной тональности
+        let sharps = keySignatures[majorKey] ?? []
+        let flats = keyFlats[majorKey] ?? []
+        
+        return (sharps, flats)
+    }
+    
     /// Парсит ABC файл и возвращает массив мелодий
     static func parseFile(url: URL) -> [ABCTune]? {
         print("ABCParser: Trying to read file at \(url.path)")
@@ -200,12 +258,8 @@ class ABCParser {
     
     /// Парсит ноты из тела мелодии с поддержкой реприз, триолей и затактов
     private static func parseNotes(body: String, key: String, defaultLength: Double) -> [MIDINote] {
-        // Определяем ключевые знаки
-        let keyBase = key.replacingOccurrences(of: "maj", with: "")
-                        .replacingOccurrences(of: "min", with: "")
-                        .trimmingCharacters(in: .whitespaces)
-        let sharps = keySignatures[keyBase] ?? []
-        let flats = keyFlats[keyBase] ?? []
+        // Определяем ключевые знаки с учётом минора и ладов
+        let (sharps, flats) = getKeySignature(for: key)
         
         // Сначала разворачиваем репризы
         let expandedBody = expandRepeats(body)
