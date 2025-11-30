@@ -56,4 +56,44 @@ struct KeyCalculator {
     static func isMinorKey(_ key: String) -> Bool {
         return key.lowercased().hasSuffix("m")
     }
+
+    /// Рассчитывает оптимальное транспонирование с учетом диапазона свистля
+    static func optimalTranspose(from baseKey: String, to targetKey: String, notes: [MIDINote], whistleKey: WhistleKey) -> Int {
+        // Сначала рассчитываем базовое транспонирование для смены тональности
+        let baseTranspose = transposeNeeded(from: baseKey, to: targetKey)
+
+        // Получаем диапазон свистля
+        let pitchRange = whistleKey.pitchRange
+        let minPitch = Int(pitchRange.min)
+        let maxPitch = Int(pitchRange.max)
+        let optimalCenter = (minPitch + maxPitch) / 2
+
+        // Находим оптимальный октавный сдвиг (-2..+2 октавы)
+        var bestTranspose = baseTranspose
+        var bestScore = 0
+
+        for octaveShift in -2...2 {
+            let totalTranspose = baseTranspose + octaveShift * 12
+            var inRangeCount = 0
+
+            for note in notes {
+                let transposedPitch = Int(note.pitch) + totalTranspose
+                if transposedPitch >= minPitch && transposedPitch <= maxPitch {
+                    inRangeCount += 1
+                }
+            }
+
+            // Также учитываем расстояние от центра диапазона
+            let avgPitch = notes.map { Int($0.pitch) + totalTranspose }.reduce(0, +) / max(1, notes.count)
+            let centerDistance = abs(avgPitch - optimalCenter)
+            let score = inRangeCount * 100 - centerDistance
+
+            if score > bestScore {
+                bestScore = score
+                bestTranspose = totalTranspose
+            }
+        }
+
+        return bestTranspose
+    }
 }

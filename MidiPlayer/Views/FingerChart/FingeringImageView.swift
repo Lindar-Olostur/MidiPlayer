@@ -12,14 +12,18 @@ struct FingeringImageView: View {
     let whistleKey: WhistleKey
     
     var body: some View {
-        if let degree = WhistleConverter.pitchToFingering(note.pitch, whistleKey: whistleKey) {
-            // Используем картинку соответствующей октавы (I, II, III... или I², II², III²...)
+        // Проверяем, находится ли нота в диапазоне свистля
+        let pitchRange = whistleKey.pitchRange
+        let isInRange = note.pitch >= pitchRange.min && note.pitch <= pitchRange.max
+
+        if isInRange, let degree = WhistleConverter.pitchToFingering(note.pitch, whistleKey: whistleKey) {
+            // Нота в диапазоне и playable - показываем аппликатуру
             Image(degree.imageName)
                 .resizable()
                 .scaledToFit()
                 .frame(maxWidth: .infinity, alignment: .leading)
         } else {
-            // Неизвестная нота (хроматическая)
+            // Нота вне диапазона или не playable
             VStack(spacing: 1) {
                 Text("?")
                     .font(.system(size: 18, weight: .medium))
@@ -35,13 +39,21 @@ struct FingeringImageView: View {
 
 #Preview {
     HStack {
+        // Нота в диапазоне D свистля (D3-B4 = 50-71)
         FingeringImageView(
-            note: MIDINote(pitch: 62, velocity: 80, startBeat: 0, duration: 2, channel: 0),
+            note: MIDINote(pitch: 62, velocity: 80, startBeat: 0, duration: 2, channel: 0), // D4
             width: 60,
             whistleKey: .D_high
         )
+        // Нота вне диапазона D свистля
         FingeringImageView(
-            note: MIDINote(pitch: 74, velocity: 80, startBeat: 0, duration: 2, channel: 0),
+            note: MIDINote(pitch: 74, velocity: 80, startBeat: 0, duration: 2, channel: 0), // D5 - вне диапазона
+            width: 60,
+            whistleKey: .D_high
+        )
+        // Хроматическая нота в диапазоне
+        FingeringImageView(
+            note: MIDINote(pitch: 63, velocity: 80, startBeat: 0, duration: 2, channel: 0), // D#4 - хроматическая
             width: 60,
             whistleKey: .D_high
         )

@@ -69,6 +69,10 @@ struct ContentView: View {
         }
         .onChange(of: whistleKey) { _, _ in
             updatePlayableKeys()
+            // Оптимизируем октаву при смене свистля, если пользователь не менял настройки
+            if sequencer.transpose == 0 {
+                optimizeOctaveForCurrentTune()
+            }
         }
     }
     
@@ -178,7 +182,13 @@ struct ContentView: View {
     
     /// Выбор тональности из списка playable тональностей
     private func selectKey(_ key: String) {
-        sequencer.transpose = KeyCalculator.transposeNeeded(from: currentTuneKey, to: key)
+        guard let originalInfo = sequencer.originalTuneInfo else { return }
+        sequencer.transpose = KeyCalculator.optimalTranspose(
+            from: currentTuneKey,
+            to: key,
+            notes: originalInfo.allNotes,
+            whistleKey: whistleKey
+        )
     }
 
     /// Текущая отображаемая тональность (с учётом транспонирования)
@@ -280,6 +290,26 @@ struct ContentView: View {
     private func updateWhistleKeyFromTune() {
         whistleKey = WhistleKey.from(tuneKey: currentTuneKey)
         updatePlayableKeys()
+        optimizeOctaveForCurrentTune()
+    }
+
+    /// Оптимизирует октаву для текущей мелодии и выбранного свистля
+    private func optimizeOctaveForCurrentTune() {
+        guard let originalInfo = sequencer.originalTuneInfo else { return }
+
+        // Оптимизируем октаву для текущей тональности (без смены тональности)
+        let optimalTranspose = KeyCalculator.optimalTranspose(
+            from: currentTuneKey,
+            to: currentTuneKey,  // та же тональность
+            notes: originalInfo.allNotes,
+            whistleKey: whistleKey
+        )
+
+        // Устанавливаем оптимальную октаву только если текущий transpose = 0
+        // (т.е. если пользователь еще не менял настройки вручную)
+        if sequencer.transpose == 0 {
+            sequencer.transpose = optimalTranspose
+        }
     }
 
     private func updatePlayableKeys() {
