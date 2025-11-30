@@ -9,7 +9,8 @@ import Foundation
 
 /// Сервис для расчета и работы с музыкальными тональностями
 struct KeyCalculator {
-    private static let noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    // Используем ту же систему обозначений, что и вистлы: бемоли для Eb, Bb, Ab, диезы для C#, F#
+    private static let noteNames = ["C", "C#", "D", "E♭", "E", "F", "F#", "G", "A♭", "A", "B♭", "B"]
 
     private static let noteMap: [String: Int] = [
         "C": 0, "C#": 1, "Db": 1, "C♯": 1, "D": 2, "D#": 3, "Eb": 3, "D♯": 3, "E": 4,

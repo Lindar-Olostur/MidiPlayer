@@ -212,8 +212,9 @@ struct WhistleConverter {
     }
 
     /// Преобразует индекс в название ноты
+    /// Использует ту же систему обозначений, что и вистлы: бемоли для Eb, Bb, Ab, диезы для C#, F#
     private static func indexToNoteName(_ index: Int, isMinor: Bool) -> String {
-        let noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        let noteNames = ["C", "C#", "D", "E♭", "E", "F", "F#", "G", "A♭", "A", "B♭", "B"]
         let noteName = noteNames[(index + 12) % 12]
         return isMinor ? "\(noteName)m" : noteName
     }
