@@ -186,8 +186,30 @@ struct WhistleConverter {
             }
         }
 
-        // Возвращаем отсортированный массив уникальных тональностей
-        return Array(playableKeysSet).sorted()
+        // Сортируем тональности по близости к тонике вистла
+        let whistleTonicIndex = whistleKey.tonicNote
+        
+        // Функция для вычисления циклического расстояния между двумя индексами нот
+        func circularDistance(_ index1: Int, _ index2: Int) -> Int {
+            let diff = abs(index1 - index2)
+            return min(diff, 12 - diff)
+        }
+        
+        // Преобразуем Set в массив и сортируем по расстоянию от тоники вистла
+        let sortedKeys = Array(playableKeysSet).sorted { key1, key2 in
+            let index1 = noteNameToIndex(key1)
+            let index2 = noteNameToIndex(key2)
+            let distance1 = circularDistance(index1, whistleTonicIndex)
+            let distance2 = circularDistance(index2, whistleTonicIndex)
+            
+            // Если расстояния равны, сортируем по индексу
+            if distance1 == distance2 {
+                return index1 < index2
+            }
+            return distance1 < distance2
+        }
+        
+        return sortedKeys
     }
 
     /// Преобразует название ноты в индекс (C=0, C#=1, D=2, ...)
