@@ -29,6 +29,11 @@ class MIDISequencer {
     // Оригинальные данные MIDI (без транспонирования)
     private var originalMIDIInfo: MIDIFileInfo?
     private var originalMIDIURL: URL?
+
+    // Публичный доступ к оригинальным данным
+    var originalTuneInfo: MIDIFileInfo? {
+        return originalMIDIInfo
+    }
     
     // ABC данные //TODO брать только первый
     var abcTunes: [ABCTune] = []
@@ -241,21 +246,26 @@ class MIDISequencer {
     
     func loadTune(at index: Int) {
         guard index >= 0 && index < abcTunes.count else { return }
-        
+
         selectedTuneIndex = index
         let tune = abcTunes[index]
-        
+
+        // Сохраняем оригинальные данные (без транспонирования) для определения тональности
+        let originalMIDIInfo = ABCParser.toMIDIFileInfo(tune, transpose: 0)
+        self.originalMIDIInfo = originalMIDIInfo
+        self.originalMIDIURL = nil // Для ABC файлов URL не нужен
+
         // Конвертируем в MIDIFileInfo (с учётом транспонирования для отображения)
         midiInfo = ABCParser.toMIDIFileInfo(tune, transpose: transpose)
-        
+
         // Создаём секвенс из нот
         createSequenceFromNotes(tune.notes)
-        
+
         // Устанавливаем параметры
         tempo = 120 // Стандартный темп для рилов, можно настроить
         startMeasure = 1
         endMeasure = midiInfo?.totalMeasures ?? 1
-        
+
         print("Loaded tune: \(tune.title) - \(tune.notes.count) notes, transpose: \(transpose)")
     }
     

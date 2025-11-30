@@ -76,14 +76,14 @@ struct ContentView: View {
                 visualizationSection
                     .ignoresSafeArea(edges: .leading)
             }
-            .onTapGesture {
-                withAnimation { sequencer.pause() }
-            }
             .overlay(alignment: .bottom) {
                 if !sequencer.isPlaying {
                     playbackControlsSection
                         .transition(.move(edge: .bottom))
                 }
+            }
+            .onTapGesture {
+                withAnimation { sequencer.pause() }
             }
     }
     
@@ -203,7 +203,8 @@ struct ContentView: View {
                     startMeasure: sequencer.startMeasure,
                     endMeasure: sequencer.endMeasure,
                     isPlaying: sequencer.isPlaying,
-                    whistleKey: whistleKey
+                    whistleKey: whistleKey,
+                    mode: orientation.isPortrait ? .portrait : .landscape
                 )
                 .frame(height: 220)
                 .padding(.horizontal, 12)
@@ -378,9 +379,20 @@ struct ContentView: View {
     }
     
     private var currentTuneKey: String {
-        // Всегда используем KeyDetector для анализа нот (и для ABC, и для MIDI)
-        if let midiInfo = sequencer.midiInfo {
+        // Определяем тональность по оригинальным нотам (до транспонирования)
+        if let originalInfo = sequencer.originalTuneInfo {
+            // Для MIDI используем оригинальные ноты
+            return KeyDetector.detectKey(from: originalInfo.allNotes)
+        } else if let midiInfo = sequencer.midiInfo, sequencer.abcTunes.isEmpty {
+            // Для MIDI без оригинальных данных (старый код)
             return KeyDetector.detectKey(from: midiInfo.allNotes)
+        } else if !sequencer.abcTunes.isEmpty {
+            // Для ABC мелодий используем ключ из файла (если есть) или анализируем
+            if let firstTune = sequencer.abcTunes.first, !firstTune.key.isEmpty {
+                return firstTune.key
+            } else if let midiInfo = sequencer.midiInfo {
+                return KeyDetector.detectKey(from: midiInfo.allNotes)
+            }
         }
         return "C"
     }

@@ -27,7 +27,7 @@ struct FingerChartView: View {
     let whistleKey: WhistleKey
     
     // Настройки
-    @State var mode: ChartScale = .landscape
+    var mode: ChartScale = .portrait
     private let noteHeight: CGFloat = 6
     private let pianoKeyWidth: CGFloat = 35
     
