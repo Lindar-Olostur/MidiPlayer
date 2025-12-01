@@ -112,19 +112,20 @@ struct WhistleConverter {
         let midiPitch = Int(pitch)
         let pitchNote = midiPitch % 12  // Нота без октавы (0-11)
         let whistleTonicNote = whistleKey.tonicNote
-        
+
         // Вычисляем интервал от тоники вистла (0-11)
         var interval = pitchNote - whistleTonicNote
         if interval < 0 {
             interval += 12
         }
-        
-        // Определяем октаву относительно диапазона свистля
-        // Если нота в верхней половине диапазона - используем вторую октаву аппликатур
-        let pitchRange = whistleKey.pitchRange
-        let rangeCenter = (Int(pitchRange.min) + Int(pitchRange.max)) / 2
-        let isUpperOctave = midiPitch >= rangeCenter
-        
+
+        // Определяем октаву: вторая октава начинается с тоники следующей октавы
+        // Для D whistle: тоника D4 (62), вторая октава с D5 (74) и выше
+        // Вычисляем октаву тоники: (pitchRange.min - tonicNote) / 12 + 1
+        let tonicOctave = (Int(whistleKey.pitchRange.min) - whistleTonicNote) / 12 + 1
+        let upperOctaveThreshold = whistleTonicNote + 12 * tonicOctave
+        let isUpperOctave = midiPitch >= upperOctaveThreshold
+
         // Только диатонические ступени мажорной гаммы
         switch interval {
         case 0:  return isUpperOctave ? .I2 : .I
@@ -133,8 +134,8 @@ struct WhistleConverter {
         case 5:  return isUpperOctave ? .IV2 : .IV
         case 7:  return isUpperOctave ? .V2 : .V
         case 9:  return isUpperOctave ? .VI2 : .VI
-        case 10: return .flatVII  // ♭VII только в первой октаве
-        case 11: return .VII  // VII всегда в первой октаве (все клапаны открыты)
+        case 10: return .flatVII  // ♭VII - всегда одинаково (все клапаны открыты)
+        case 11: return .VII      // VII - всегда одинаково (все клапаны открыты)
         default: return nil  // Хроматические ноты
         }
     }
@@ -240,6 +241,7 @@ struct WhistleConverter {
         let noteName = noteNames[(index + 12) % 12]
         return isMinor ? "\(noteName)m" : noteName
     }
+
 }
 
 // MARK: - Key Converter
