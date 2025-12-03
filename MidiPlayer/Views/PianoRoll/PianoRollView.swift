@@ -110,36 +110,36 @@ struct PianoRollView: View {
                     .offset(x: -min(max(0, offset), maxOffset))
                 }
                 .clipped()
-                .gesture(
-                    // Pinch to zoom
-                    MagnificationGesture()
-                        .onChanged { value in
-                            let newScale = lastScale * value
-                            scale = min(max(newScale, minScale), maxScale)
-                            
-                            // Корректируем offset при зуме чтобы центр оставался на месте
-                            let newMaxOffset = max(0, CGFloat(visibleBeats) * baseWidth * scale - availableWidth)
-                            offset = min(offset, newMaxOffset)
-                        }
-                        .onEnded { _ in
-                            lastScale = scale
-                            lastOffset = offset
-                        }
-                )
-                .simultaneousGesture(
-                    // Drag to pan (когда зум > 1)
-                    DragGesture()
-                        .onChanged { value in
-                            if scale > 1.0 {
-                                let newOffset = lastOffset - value.translation.width
-                                let currentMaxOffset = max(0, CGFloat(visibleBeats) * baseWidth * scale - availableWidth)
-                                offset = min(max(0, newOffset), currentMaxOffset)
-                            }
-                        }
-                        .onEnded { _ in
-                            lastOffset = offset
-                        }
-                )
+//                .gesture(
+//                    // Pinch to zoom
+//                    MagnificationGesture()
+//                        .onChanged { value in
+//                            let newScale = lastScale * value
+//                            scale = min(max(newScale, minScale), maxScale)
+//                            
+//                            // Корректируем offset при зуме чтобы центр оставался на месте
+//                            let newMaxOffset = max(0, CGFloat(visibleBeats) * baseWidth * scale - availableWidth)
+//                            offset = min(offset, newMaxOffset)
+//                        }
+//                        .onEnded { _ in
+//                            lastScale = scale
+//                            lastOffset = offset
+//                        }
+//                )
+//                .simultaneousGesture(
+//                    // Drag to pan (когда зум > 1)
+//                    DragGesture()
+//                        .onChanged { value in
+//                            if scale > 1.0 {
+//                                let newOffset = lastOffset - value.translation.width
+//                                let currentMaxOffset = max(0, CGFloat(visibleBeats) * baseWidth * scale - availableWidth)
+//                                offset = min(max(0, newOffset), currentMaxOffset)
+//                            }
+//                        }
+//                        .onEnded { _ in
+//                            lastOffset = offset
+//                        }
+//                )
                 .overlay(
                     // Индикатор зума
                     VStack {

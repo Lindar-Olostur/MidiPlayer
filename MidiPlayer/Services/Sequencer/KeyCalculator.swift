@@ -151,5 +151,43 @@ struct KeyCalculator {
         // (это не должно происходить, если тональность в списке playable keys)
         return bestTranspose
     }
+    
+    /// Транспонирует мелодию так, чтобы тоника была на 4 октаве (C4 = MIDI 60)
+    /// Находит самую низкую ноту тоники в мелодии и транспонирует её в C4
+    static func transposeToOctave4(key: String, notes: [MIDINote]) -> Int {
+        // Получаем индекс тоники (0-11)
+        let tonicIndex = noteNameToIndex(key)
+        
+        // Находим самую низкую ноту тоники в мелодии
+        var lowestTonicPitch: Int? = nil
+        
+        for note in notes {
+            let pitchClass = Int(note.pitch) % 12
+            if pitchClass == tonicIndex {
+                let pitch = Int(note.pitch)
+                if lowestTonicPitch == nil || pitch < lowestTonicPitch! {
+                    lowestTonicPitch = pitch
+                }
+            }
+        }
+        
+        // Если не нашли тонику, используем самую низкую ноту
+        if lowestTonicPitch == nil {
+            lowestTonicPitch = notes.map { Int($0.pitch) }.min()
+        }
+        
+        guard let tonicPitch = lowestTonicPitch else {
+            return 0 // Если нет нот, не транспонируем
+        }
+        
+        // Целевая тоника - C4 (60)
+        let targetTonicPitch = 60
+        
+        // Вычисляем транспонирование
+        let transpose = targetTonicPitch - tonicPitch
+        
+        // Ограничиваем транспонирование разумными пределами (-24 до +24 полутонов)
+        return max(-24, min(24, transpose))
+    }
 }
 

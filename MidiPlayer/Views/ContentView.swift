@@ -101,7 +101,7 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showFileImport) {
             FileImportView(tuneManager: tuneManager) { tune in
-                loadTune(tune)
+                loadNewImportedTune(tune)
             }
         }
     }
@@ -320,7 +320,43 @@ struct ContentView: View {
     
     // MARK: - Methods
     
-    /// Загружает мелодию из TuneModel
+    /// Загружает новую импортированную мелодию с автоматическим транспонированием в C4
+    private func loadNewImportedTune(_ tune: TuneModel) {
+        // Загружаем БЕЗ установки currentTuneId, чтобы применить автотранспонирование
+        sourceType = tune.fileType
+        sequencer.stop()
+        
+        // Загружаем файл
+        let fileURL = tuneManager.fileURL(for: tune)
+        if tune.fileType == .midi {
+            sequencer.loadMIDIFile(url: fileURL)
+        } else {
+            sequencer.loadABCFile(url: fileURL)
+            sequencer.selectedTuneIndex = tune.selectedTuneIndex
+        }
+        
+        // Устанавливаем строй вистла и применяем транспонирование в C4
+        whistleKey = WhistleKey.from(tuneKey: currentTuneKey)
+        updatePlayableKeys()
+        transposeToOctave4()
+        
+        // Сохраняем настройки с новым транспонированием
+        tuneManager.saveSettings(
+            for: tune.id,
+            transpose: sequencer.transpose,
+            tempo: sequencer.tempo,
+            whistleKey: whistleKey,
+            selectedKey: playableKeyVariants.first(where: { $0.transpose == sequencer.transpose })?.key,
+            startMeasure: sequencer.startMeasure,
+            endMeasure: sequencer.endMeasure,
+            selectedTuneIndex: sequencer.selectedTuneIndex
+        )
+        
+        // Теперь устанавливаем currentTuneId
+        currentTuneId = tune.id
+    }
+    
+    /// Загружает мелодию из TuneModel (для сохраненных мелодий)
     private func loadTune(_ tune: TuneModel) {
         currentTuneId = tune.id
         sourceType = tune.fileType
@@ -343,7 +379,8 @@ struct ContentView: View {
         }
         
         // Устанавливаем строй вистла по тональности мелодии
-        updateWhistleKeyFromTune()
+        // Для сохраненных мелодий не применяем автотранспонирование
+        updateWhistleKeyFromTune(applyAutoTranspose: false)
         
         // Восстанавливаем выбранную тональность если есть
         if let selectedKey = tune.selectedKey {
@@ -387,10 +424,31 @@ struct ContentView: View {
         updateWhistleKeyFromTune()
     }
     
-    private func updateWhistleKeyFromTune() {
+    private func updateWhistleKeyFromTune(applyAutoTranspose: Bool = true) {
         whistleKey = WhistleKey.from(tuneKey: currentTuneKey)
         updatePlayableKeys()
-        optimizeOctaveForCurrentTune()
+        
+        // Если это новая мелодия (не сохраненная), транспонируем в тонику на 4 октаву
+        if currentTuneId == nil && applyAutoTranspose {
+            transposeToOctave4()
+        } else if currentTuneId == nil {
+            // Для новых мелодий без автотранспонирования используем оптимальную октаву
+            optimizeOctaveForCurrentTune()
+        }
+        // Для сохраненных мелодий (currentTuneId != nil) не меняем транспонирование
+    }
+    
+    /// Транспонирует мелодию так, чтобы тоника была на 4 октаве (C4)
+    private func transposeToOctave4() {
+        guard let originalInfo = sequencer.originalTuneInfo else { return }
+        
+        let transpose = KeyCalculator.transposeToOctave4(
+            key: currentTuneKey,
+            notes: originalInfo.allNotes
+        )
+        
+        sequencer.transpose = transpose
+        print("🎵 Автоматически транспонировано в тонику на 4 октаву: \(transpose > 0 ? "+" : "")\(transpose) полутонов")
     }
 
     /// Оптимизирует октаву для текущей мелодии и выбранного свистля
@@ -406,8 +464,8 @@ struct ContentView: View {
         )
 
         // Устанавливаем оптимальную октаву
-            sequencer.transpose = optimalTranspose
-        }
+        sequencer.transpose = optimalTranspose
+    }
 
     @discardableResult
     private func updatePlayableKeys() -> [String] {
