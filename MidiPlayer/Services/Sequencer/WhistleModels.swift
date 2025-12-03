@@ -10,7 +10,7 @@ import Foundation
 // MARK: - Whistle Key (строй вистла)
 
 /// Строй вистла от высокого Eb до E (хроматически)
-enum WhistleKey: String, CaseIterable {
+enum WhistleKey: String, CaseIterable, Codable {
     // От высокого к низкому
     case Eb = "Eb"
     case D_high = "D"
@@ -73,10 +73,10 @@ enum WhistleKey: String, CaseIterable {
         case .A:       return (57, 78)  // A3 - F#5
         case .Ab:      return (56, 77)  // G#3 - F5
         case .G:       return (55, 76)  // G3 - E5
-        case .Fsharp:  return (54, 75)  // F#3 - D#5
-        case .F:       return (53, 74)  // F3 - D5
-        case .E:       return (52, 73)  // E3 - C#5
-        case .Eb:      return (51, 72)  // Eb3 - C5
+        case .Fsharp:  return (66, 87)  // F#4 - D#6
+        case .F:       return (65, 86)  // F4 - D6
+        case .E:       return (64, 85)  // E4 - C#6
+        case .Eb:      return (63, 84)  // Eb4 - C6
         }
     }
 }
@@ -147,7 +147,15 @@ struct WhistleConverter {
         return "\(noteNames[note])\(octave)"
     }
 
+    /// Структура для хранения информации о playable варианте тональности
+    public struct PlayableKeyVariant {
+        let key: String           // Название тональности
+        let melodyMin: UInt8      // Минимальная нота мелодии
+        let transpose: Int        // Транспонирование
+    }
+
     /// Находит все тональности, в которых мелодия может быть полностью сыграна на данном вистле
+    /// Для каждой тональности выбирается вариант с самым низким диапазоном мелодии
     /// - Parameters:
     ///   - notes: оригинальные ноты мелодии
     ///   - whistleKey: строй вистла
@@ -155,7 +163,14 @@ struct WhistleConverter {
     /// - Returns: массив уникальных тональностей мелодии, где все ноты playable на данном вистле и в его диапазоне
     /// TODO еще момент: есть мелодии у которых очень узкий диапазон и на одном вистле их можно сыграть как в пеовой октаве так и с передувом. но в предложенных тональностях только один вариант. нам надо различать такие варианты и показывать оба
     static func findPlayableKeys(for notes: [MIDINote], whistleKey: WhistleKey, baseKey: String) -> [String] {
-        var playableKeysSet = Set<String>()
+        let variants = findPlayableKeyVariants(for: notes, whistleKey: whistleKey, baseKey: baseKey)
+        return variants.map { $0.key }
+    }
+
+    /// Находит все варианты тональностей с информацией о транспонировании
+    /// Для каждой тональности выбирается вариант с самым низким диапазоном мелодии
+    static func findPlayableKeyVariants(for notes: [MIDINote], whistleKey: WhistleKey, baseKey: String) -> [PlayableKeyVariant] {
+        var playableVariants = [PlayableKeyVariant]()
 
         // Получаем диапазон свистля
         let pitchRange = whistleKey.pitchRange
@@ -163,6 +178,11 @@ struct WhistleConverter {
 
         // Извлекаем базовую ноту из тональности
         let baseNoteIndex = noteNameToIndex(baseKey)
+
+        print("🔍 Поиск playable тональностей для \(notes.count) нот")
+        print("🎵 Свистель: \(whistleKey.displayName) (диапазон: \(minPitch)-\(maxPitch))")
+        print("🎼 Базовая тональность: \(baseKey) (индекс: \(baseNoteIndex))")
+        print("")
 
         // Проверяем каждое возможное транспонирование (-12 до +12 полутонов)
         for transpose in -12...12 {
@@ -183,34 +203,71 @@ struct WhistleConverter {
                 // Рассчитываем результирующую тональность мелодии
                 let newNoteIndex = (baseNoteIndex + transpose + 12) % 12
                 let newKey = indexToNoteName(newNoteIndex, isMinor: baseKey.lowercased().hasSuffix("m"))
-                playableKeysSet.insert(newKey)
+
+                // Вычисляем диапазон транспонированной мелодии
+                let transposedPitches = notes.map { UInt8(max(0, min(127, Int($0.pitch) + transpose))) }
+                let melodyMin = transposedPitches.min() ?? 0
+
+                // Сохраняем вариант
+                playableVariants.append(PlayableKeyVariant(key: newKey, melodyMin: melodyMin, transpose: transpose))
+
+                // Отладка только для успешных случаев
+                print("🎯 УСПЕХ! Транспонирование \(transpose > 0 ? "+" : "")\(transpose): тональность \(newKey)")
+                print("   Диапазон вистла: \(minPitch)-\(maxPitch), Диапазон мелодии: \(melodyMin)-\(transposedPitches.max() ?? 0)")
             }
         }
 
+        // Группируем варианты по тональности и выбираем для каждой самый низкий диапазон мелодии
+        var bestVariants = [String: PlayableKeyVariant]()
+        print("\n🎯 Группировка вариантов по тональностям:")
+        for variant in playableVariants.sorted(by: { $0.key < $1.key }) {
+            print("   Найден: \(variant.key) (transpose: \(variant.transpose > 0 ? "+" : "")\(variant.transpose), min: \(variant.melodyMin))")
+
+            if let existing = bestVariants[variant.key] {
+                // Если уже есть вариант для этой тональности, выбираем с более низким диапазоном
+                print("   Сравнение: существующий min=\(existing.melodyMin), новый min=\(variant.melodyMin)")
+                if variant.melodyMin < existing.melodyMin {
+                    print("   ✅ Заменяем на более низкий вариант!")
+                    bestVariants[variant.key] = variant
+                } else {
+                    print("   ❌ Оставляем существующий (он ниже или равен)")
+                }
+            } else {
+                bestVariants[variant.key] = variant
+                print("   ➕ Добавлен первый вариант")
+            }
+        }
+
+        print("\n📊 Выбраны оптимальные варианты:")
+        for (key, variant) in bestVariants.sorted(by: { $0.key < $1.key }) {
+            print("   \(key): транспонирование \(variant.transpose > 0 ? "+" : "")\(variant.transpose), диапазон от \(variant.melodyMin)")
+        }
+        print("")
+
         // Сортируем тональности по близости к тонике вистла
         let whistleTonicIndex = whistleKey.tonicNote
-        
+
         // Функция для вычисления циклического расстояния между двумя индексами нот
         func circularDistance(_ index1: Int, _ index2: Int) -> Int {
             let diff = abs(index1 - index2)
             return min(diff, 12 - diff)
         }
-        
-        // Преобразуем Set в массив и сортируем по расстоянию от тоники вистла
-        let sortedKeys = Array(playableKeysSet).sorted { key1, key2 in
-            let index1 = noteNameToIndex(key1)
-            let index2 = noteNameToIndex(key2)
+
+        // Получаем уникальные варианты и сортируем по расстоянию от тоники вистла
+        let sortedVariants = bestVariants.values.sorted { variant1, variant2 in
+            let index1 = noteNameToIndex(variant1.key)
+            let index2 = noteNameToIndex(variant2.key)
             let distance1 = circularDistance(index1, whistleTonicIndex)
             let distance2 = circularDistance(index2, whistleTonicIndex)
-            
+
             // Если расстояния равны, сортируем по индексу
             if distance1 == distance2 {
                 return index1 < index2
             }
             return distance1 < distance2
         }
-        
-        return sortedKeys
+
+        return sortedVariants
     }
 
     /// Преобразует название ноты в индекс (C=0, C#=1, D=2, ...)

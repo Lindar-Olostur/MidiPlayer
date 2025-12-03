@@ -11,6 +11,7 @@ struct HeaderSectionView: View {
     let tuneName: String?
     @Binding var sourceType: SourceType
     let onSourceChange: (SourceType) -> Void
+    var onImportTap: (() -> Void)?
 
     var body: some View {
         HStack {
@@ -37,6 +38,19 @@ struct HeaderSectionView: View {
 
             Spacer()
 
+            // Кнопка импорта
+            if let onImportTap = onImportTap {
+                Button(action: onImportTap) {
+                    Image(systemName: "doc.badge.plus")
+                        .font(.system(size: 18))
+                        .foregroundColor(.white)
+                        .padding(8)
+                        .background(Color.white.opacity(0.2))
+                        .clipShape(Circle())
+                }
+                .padding(.trailing, 8)
+            }
+
             // Переключатель MIDI/ABC
             Picker("Source", selection: $sourceType) {
                 ForEach(SourceType.allCases, id: \.self) { type in
@@ -58,9 +72,11 @@ struct HeaderSectionView: View {
     HeaderSectionView(
         tuneName: "Test Tune",
         sourceType: .constant(.midi),
-        onSourceChange: { _ in }
+        onSourceChange: { _ in },
+        onImportTap: nil
     )
 }
+
 
 
 

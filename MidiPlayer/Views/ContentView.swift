@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - Enums
 
-enum SourceType: String, CaseIterable {
+enum SourceType: String, CaseIterable, Codable {
     case midi = "MIDI"
     case abc = "ABC"
 }
@@ -34,7 +34,12 @@ struct ContentView: View {
     @State private var sourceType: SourceType = .midi
     @State private var viewMode: ViewMode = .fingerChart
     @State private var whistleKey: WhistleKey = .D_high
+    @State private var playableKeyVariants: [WhistleConverter.PlayableKeyVariant] = []
     @State private var playableKeys: [String] = []
+    @StateObject private var tuneManager = TuneManager()
+    @StateObject private var appSettings = AppSettings()
+    @State private var showFileImport = false
+    @State private var currentTuneId: UUID?
     
     var body: some View {
         ZStack {
@@ -56,7 +61,12 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            loadSource(sourceType)
+            // Загружаем последнюю мелодию или дефолтную
+            if let lastTune = tuneManager.tunes.last {
+                loadTune(lastTune)
+            } else {
+                loadSource(sourceType)
+            }
             orientation.setupOrientationObserver()
             AppDelegate.orientationLock = .all
         }
@@ -74,6 +84,24 @@ struct ContentView: View {
                 selectKey(firstKey)
             } else {
                 optimizeOctaveForCurrentTune()
+            }
+            saveCurrentSettings()
+        }
+        .onChange(of: sequencer.transpose) { _, _ in
+            saveCurrentSettings()
+        }
+        .onChange(of: sequencer.tempo) { _, _ in
+            saveCurrentSettings()
+        }
+        .onChange(of: sequencer.startMeasure) { _, _ in
+            saveCurrentSettings()
+        }
+        .onChange(of: sequencer.endMeasure) { _, _ in
+            saveCurrentSettings()
+        }
+        .sheet(isPresented: $showFileImport) {
+            FileImportView(tuneManager: tuneManager) { tune in
+                loadTune(tune)
             }
         }
     }
@@ -103,7 +131,10 @@ struct ContentView: View {
             HeaderSectionView(
                 tuneName: currentTuneName,
                 sourceType: $sourceType,
-                onSourceChange: loadSource
+                onSourceChange: loadSource,
+                onImportTap: {
+                    showFileImport = true
+                }
             )
                 
                 // Выбор мелодии для ABC и строй вистла
@@ -182,13 +213,22 @@ struct ContentView: View {
     
     /// Выбор тональности из списка playable тональностей
     private func selectKey(_ key: String) {
-        guard let originalInfo = sequencer.originalTuneInfo else { return }
-        sequencer.transpose = KeyCalculator.optimalTranspose(
-            from: currentTuneKey,
-            to: key,
-            notes: originalInfo.allNotes,
-            whistleKey: whistleKey
-        )
+        // Находим вариант для выбранной тональности
+        if let variant = playableKeyVariants.first(where: { $0.key == key }) {
+            sequencer.transpose = variant.transpose
+            print("🎵 Выбрана тональность \(key) с транспонированием \(variant.transpose > 0 ? "+" : "")\(variant.transpose) (диапазон от \(variant.melodyMin))")
+        } else {
+            // Fallback на старую логику, если вариант не найден
+            guard let originalInfo = sequencer.originalTuneInfo else { return }
+            sequencer.transpose = KeyCalculator.optimalTranspose(
+                from: currentTuneKey,
+                to: key,
+                notes: originalInfo.allNotes,
+                whistleKey: whistleKey
+            )
+            print("⚠️ Вариант не найден, использован optimalTranspose")
+        }
+        saveCurrentSettings()
     }
 
     /// Текущая отображаемая тональность (с учётом транспонирования)
@@ -245,6 +285,12 @@ struct ContentView: View {
     }
     
     private var currentTuneName: String? {
+        // Если есть загруженная мелодия из файла, используем её название
+        if let tuneId = currentTuneId, let tune = tuneManager.tunes.first(where: { $0.id == tuneId }) {
+            return tune.title ?? tune.originalFileName
+        }
+        
+        // Иначе используем старую логику для bundle файлов
         if sourceType == .abc && !sequencer.abcTunes.isEmpty {
             return sequencer.abcTunes[sequencer.selectedTuneIndex].title
         } else if sourceType == .midi {
@@ -274,9 +320,59 @@ struct ContentView: View {
     
     // MARK: - Methods
     
+    /// Загружает мелодию из TuneModel
+    private func loadTune(_ tune: TuneModel) {
+        currentTuneId = tune.id
+        sourceType = tune.fileType
+        sequencer.stop()
+        
+        // Восстанавливаем настройки
+        sequencer.transpose = tune.transpose
+        sequencer.tempo = tune.tempo
+        whistleKey = tune.whistleKey
+        sequencer.startMeasure = tune.startMeasure
+        sequencer.endMeasure = tune.endMeasure
+        
+        // Загружаем файл
+        let fileURL = tuneManager.fileURL(for: tune)
+        if tune.fileType == .midi {
+            sequencer.loadMIDIFile(url: fileURL)
+        } else {
+            sequencer.loadABCFile(url: fileURL)
+            sequencer.selectedTuneIndex = tune.selectedTuneIndex
+        }
+        
+        // Устанавливаем строй вистла по тональности мелодии
+        updateWhistleKeyFromTune()
+        
+        // Восстанавливаем выбранную тональность если есть
+        if let selectedKey = tune.selectedKey {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                selectKey(selectedKey)
+            }
+        }
+    }
+    
+    /// Сохраняет текущие настройки мелодии
+    private func saveCurrentSettings() {
+        guard let tuneId = currentTuneId else { return }
+        
+        tuneManager.saveSettings(
+            for: tuneId,
+            transpose: sequencer.transpose,
+            tempo: sequencer.tempo,
+            whistleKey: whistleKey,
+            selectedKey: playableKeyVariants.first(where: { $0.transpose == sequencer.transpose })?.key,
+            startMeasure: sequencer.startMeasure,
+            endMeasure: sequencer.endMeasure,
+            selectedTuneIndex: sequencer.selectedTuneIndex
+        )
+    }
+    
     private func loadSource(_ source: SourceType) {
         // sourceType уже установлен через binding в HeaderSectionView
         sequencer.stop()
+        currentTuneId = nil
         
         // Сбрасываем транспонирование при переключении источника
         sequencer.transpose = 0
@@ -315,17 +411,19 @@ struct ContentView: View {
 
     @discardableResult
     private func updatePlayableKeys() -> [String] {
-        guard let originalInfo = sequencer.originalTuneInfo else { 
+        guard let originalInfo = sequencer.originalTuneInfo else {
             playableKeys = []
+            playableKeyVariants = []
             return []
         }
-        let keys = WhistleConverter.findPlayableKeys(
+        let variants = WhistleConverter.findPlayableKeyVariants(
             for: originalInfo.allNotes,
             whistleKey: whistleKey,
             baseKey: currentTuneKey
         )
-        playableKeys = keys
-        return keys
+        playableKeyVariants = variants
+        playableKeys = variants.map { $0.key }
+        return playableKeys
     }
 }
 

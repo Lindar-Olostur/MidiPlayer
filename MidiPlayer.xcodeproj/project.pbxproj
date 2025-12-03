@@ -17,7 +17,6 @@
 		5D25BDCE2EDC3200000A4BA8 /* HeaderSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D25BDC52EDC3200000A4BA8 /* HeaderSectionView.swift */; };
 		5D25BDCF2EDC3200000A4BA8 /* TuneAndWhistleSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D25BDC92EDC3200000A4BA8 /* TuneAndWhistleSectionView.swift */; };
 		5D25BDD12EDC3645000A4BA8 /* KeyCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D25BDD02EDC3645000A4BA8 /* KeyCalculator.swift */; };
-		5D6339152EDB623000E5C6E5 /* WhistleModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6338F72EDB623000E5C6E5 /* WhistleModels.swift */; };
 		5D6339162EDB623000E5C6E5 /* ABCParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6338FD2EDB623000E5C6E5 /* ABCParser.swift */; };
 		5D6339172EDB623000E5C6E5 /* KeyDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6338FE2EDB623000E5C6E5 /* KeyDetector.swift */; };
 		5D6339182EDB623000E5C6E5 /* MIDIParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6338FF2EDB623000E5C6E5 /* MIDIParser.swift */; };
@@ -39,6 +38,11 @@
 		5D6339282EDB623000E5C6E5 /* silverspear.abc in Resources */ = {isa = PBXBuildFile; fileRef = 5D6338FA2EDB623000E5C6E5 /* silverspear.abc */; };
 		5D6339292EDB623000E5C6E5 /* silverspear.mid in Resources */ = {isa = PBXBuildFile; fileRef = 5D6338FB2EDB623000E5C6E5 /* silverspear.mid */; };
 		5D63392A2EDB623000E5C6E5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D6339112EDB623000E5C6E5 /* Assets.xcassets */; };
+		5DAFC6E02EE0B08C00E3F799 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAFC6DF2EE0B08C00E3F799 /* AppSettings.swift */; };
+		5DAFC6E32EE0B26E00E3F799 /* TuneManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAFC6E12EE0B26E00E3F799 /* TuneManager.swift */; };
+		5DAFC6E42EE0B26E00E3F799 /* TuneModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAFC6E22EE0B26E00E3F799 /* TuneModel.swift */; };
+		5DAFC6E62EE0B27700E3F799 /* WhistleModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAFC6E52EE0B27700E3F799 /* WhistleModels.swift */; };
+		5DAFC6E82EE0B29800E3F799 /* FileImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAFC6E72EE0B29800E3F799 /* FileImportView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,7 +54,6 @@
 		5D25BDC82EDC3200000A4BA8 /* TempoAndTransposeSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempoAndTransposeSectionView.swift; sourceTree = "<group>"; };
 		5D25BDC92EDC3200000A4BA8 /* TuneAndWhistleSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneAndWhistleSectionView.swift; sourceTree = "<group>"; };
 		5D25BDD02EDC3645000A4BA8 /* KeyCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCalculator.swift; sourceTree = "<group>"; };
-		5D6338F72EDB623000E5C6E5 /* WhistleModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhistleModels.swift; sourceTree = "<group>"; };
 		5D6338F92EDB623000E5C6E5 /* ievanpolkka.abc */ = {isa = PBXFileReference; lastKnownFileType = text; path = ievanpolkka.abc; sourceTree = "<group>"; };
 		5D6338FA2EDB623000E5C6E5 /* silverspear.abc */ = {isa = PBXFileReference; lastKnownFileType = text; path = silverspear.abc; sourceTree = "<group>"; };
 		5D6338FB2EDB623000E5C6E5 /* silverspear.mid */ = {isa = PBXFileReference; lastKnownFileType = audio.midi; path = silverspear.mid; sourceTree = "<group>"; };
@@ -73,6 +76,11 @@
 		5D6339112EDB623000E5C6E5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5D6339122EDB623000E5C6E5 /* MidiPlayer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MidiPlayer.entitlements; sourceTree = "<group>"; };
 		5D6339132EDB623000E5C6E5 /* MidiPlayerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MidiPlayerApp.swift; sourceTree = "<group>"; };
+		5DAFC6DF2EE0B08C00E3F799 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		5DAFC6E12EE0B26E00E3F799 /* TuneManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneManager.swift; sourceTree = "<group>"; };
+		5DAFC6E22EE0B26E00E3F799 /* TuneModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneModel.swift; sourceTree = "<group>"; };
+		5DAFC6E52EE0B27700E3F799 /* WhistleModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhistleModels.swift; sourceTree = "<group>"; };
+		5DAFC6E72EE0B29800E3F799 /* FileImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileImportView.swift; sourceTree = "<group>"; };
 		9DB318972ED887A00002599E /* MidiPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MidiPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -111,14 +119,6 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
-		5D6338F82EDB623000E5C6E5 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				5D6338F72EDB623000E5C6E5 /* WhistleModels.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
 		5D6338FC2EDB623000E5C6E5 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -132,12 +132,10 @@
 		5D6339012EDB623000E5C6E5 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				5D25BDD02EDC3645000A4BA8 /* KeyCalculator.swift */,
+				5DAFC6DF2EE0B08C00E3F799 /* AppSettings.swift */,
+				5DAFC6DA2EE0B01800E3F799 /* Tune */,
 				5D25BDC12EDC1AD7000A4BA8 /* Orientation */,
-				5D6338FD2EDB623000E5C6E5 /* ABCParser.swift */,
-				5D6338FE2EDB623000E5C6E5 /* KeyDetector.swift */,
-				5D6338FF2EDB623000E5C6E5 /* MIDIParser.swift */,
-				5D6339002EDB623000E5C6E5 /* MIDISequencer.swift */,
+				5DAFC6D92EE0B00000E3F799 /* Sequencer */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -169,6 +167,7 @@
 		5D6339102EDB623000E5C6E5 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5DAFC6E72EE0B29800E3F799 /* FileImportView.swift */,
 				5D25BDCA2EDC3200000A4BA8 /* Components */,
 				5D6339082EDB623000E5C6E5 /* FingerChart */,
 				5D63390D2EDB623000E5C6E5 /* PianoRoll */,
@@ -180,7 +179,6 @@
 		5D6339142EDB623000E5C6E5 /* MidiPlayer */ = {
 			isa = PBXGroup;
 			children = (
-				5D6338F82EDB623000E5C6E5 /* Models */,
 				5D6338FC2EDB623000E5C6E5 /* Resources */,
 				5D6339012EDB623000E5C6E5 /* Services */,
 				5D6339102EDB623000E5C6E5 /* Views */,
@@ -189,6 +187,28 @@
 				5D6339132EDB623000E5C6E5 /* MidiPlayerApp.swift */,
 			);
 			path = MidiPlayer;
+			sourceTree = "<group>";
+		};
+		5DAFC6D92EE0B00000E3F799 /* Sequencer */ = {
+			isa = PBXGroup;
+			children = (
+				5DAFC6E52EE0B27700E3F799 /* WhistleModels.swift */,
+				5D6338FD2EDB623000E5C6E5 /* ABCParser.swift */,
+				5D25BDD02EDC3645000A4BA8 /* KeyCalculator.swift */,
+				5D6338FE2EDB623000E5C6E5 /* KeyDetector.swift */,
+				5D6338FF2EDB623000E5C6E5 /* MIDIParser.swift */,
+				5D6339002EDB623000E5C6E5 /* MIDISequencer.swift */,
+			);
+			path = Sequencer;
+			sourceTree = "<group>";
+		};
+		5DAFC6DA2EE0B01800E3F799 /* Tune */ = {
+			isa = PBXGroup;
+			children = (
+				5DAFC6E12EE0B26E00E3F799 /* TuneManager.swift */,
+				5DAFC6E22EE0B26E00E3F799 /* TuneModel.swift */,
+			);
+			path = Tune;
 			sourceTree = "<group>";
 		};
 		9DB3188E2ED887A00002599E = {
@@ -288,7 +308,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5D6339152EDB623000E5C6E5 /* WhistleModels.swift in Sources */,
 				5D6339162EDB623000E5C6E5 /* ABCParser.swift in Sources */,
 				5D25BDC02EDC1866000A4BA8 /* AppDelegate.swift in Sources */,
 				5D6339172EDB623000E5C6E5 /* KeyDetector.swift in Sources */,
@@ -296,6 +315,7 @@
 				5D6339182EDB623000E5C6E5 /* MIDIParser.swift in Sources */,
 				5D6339192EDB623000E5C6E5 /* MIDISequencer.swift in Sources */,
 				5D25BDCB2EDC3200000A4BA8 /* PlaybackControlsSectionView.swift in Sources */,
+				5DAFC6E02EE0B08C00E3F799 /* AppSettings.swift in Sources */,
 				5D25BDCC2EDC3200000A4BA8 /* PositionInfoSectionView.swift in Sources */,
 				5D25BDD12EDC3645000A4BA8 /* KeyCalculator.swift in Sources */,
 				5D25BDCD2EDC3200000A4BA8 /* TempoAndTransposeSectionView.swift in Sources */,
@@ -304,10 +324,14 @@
 				5D63391A2EDB623000E5C6E5 /* FingerChartView.swift in Sources */,
 				5D63391B2EDB623000E5C6E5 /* FingeringImageView.swift in Sources */,
 				5D63391C2EDB623000E5C6E5 /* FingeringRowView.swift in Sources */,
+				5DAFC6E62EE0B27700E3F799 /* WhistleModels.swift in Sources */,
 				5D63391D2EDB623000E5C6E5 /* GridBackgroundCompact.swift in Sources */,
 				5D63391E2EDB623000E5C6E5 /* NoteViewCompact.swift in Sources */,
 				5D63391F2EDB623000E5C6E5 /* PianoKeysCompactView.swift in Sources */,
 				5D6339202EDB623000E5C6E5 /* GridBackground.swift in Sources */,
+				5DAFC6E32EE0B26E00E3F799 /* TuneManager.swift in Sources */,
+				5DAFC6E42EE0B26E00E3F799 /* TuneModel.swift in Sources */,
+				5DAFC6E82EE0B29800E3F799 /* FileImportView.swift in Sources */,
 				5D6339212EDB623000E5C6E5 /* NoteView.swift in Sources */,
 				5D6339222EDB623000E5C6E5 /* PianoKeysView.swift in Sources */,
 				5D6339232EDB623000E5C6E5 /* PianoRollView.swift in Sources */,
