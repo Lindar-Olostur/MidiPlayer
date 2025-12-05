@@ -261,7 +261,6 @@ struct ContentView: View {
                     whistleKey: whistleKey,
                     mode: orientation.isPortrait ? .portrait : .landscape
                 )
-                .frame(height: 220)
                 .padding(.horizontal, 12)
             }
         } else {

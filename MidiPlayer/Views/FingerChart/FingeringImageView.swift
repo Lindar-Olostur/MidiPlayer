@@ -10,6 +10,12 @@ struct FingeringImageView: View {
     let note: MIDINote
     let width: CGFloat
     let whistleKey: WhistleKey
+    let currentBeat: Double
+    
+    private var isNoteActive: Bool {
+        let noteEndBeat = note.startBeat + note.duration
+        return currentBeat >= note.startBeat && currentBeat < noteEndBeat
+    }
     
     var body: some View {
         // Проверяем, находится ли нота в диапазоне свистля
@@ -17,13 +23,8 @@ struct FingeringImageView: View {
         let isInRange = note.pitch >= pitchRange.min && note.pitch <= pitchRange.max
 
         if isInRange, let degree = WhistleConverter.pitchToFingering(note.pitch, whistleKey: whistleKey) {
-            // Нота в диапазоне и playable - показываем аппликатуру
-            Image(degree.imageName)
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: .infinity, alignment: .leading)
+            ApplicatureView(note: degree, isActive: isNoteActive, colored: true)
         } else {
-            // Нота вне диапазона или не playable
             VStack(spacing: 1) {
                 Text("?")
                     .font(.system(size: 18, weight: .medium))
@@ -43,22 +44,25 @@ struct FingeringImageView: View {
         FingeringImageView(
             note: MIDINote(pitch: 62, velocity: 80, startBeat: 0, duration: 2, channel: 0), // D4
             width: 60,
-            whistleKey: .D_high
+            whistleKey: .D_high,
+            currentBeat: 1.0
         )
         // Нота вне диапазона D свистля
         FingeringImageView(
             note: MIDINote(pitch: 74, velocity: 80, startBeat: 0, duration: 2, channel: 0), // D5 - вне диапазона
             width: 60,
-            whistleKey: .D_high
+            whistleKey: .D_high,
+            currentBeat: 1.0
         )
         // Хроматическая нота в диапазоне
         FingeringImageView(
             note: MIDINote(pitch: 63, velocity: 80, startBeat: 0, duration: 2, channel: 0), // D#4 - хроматическая
             width: 60,
-            whistleKey: .D_high
+            whistleKey: .D_high,
+            currentBeat: 1.0
         )
     }
-    .frame(height: 60)
+//    .frame(height: 60)
     .padding()
     .background(Color.white)
 }

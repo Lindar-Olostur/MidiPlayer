@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 // MARK: - Whistle Key (строй вистла)
 
@@ -83,6 +84,10 @@ enum WhistleKey: String, CaseIterable, Codable {
 
 // MARK: - Whistle Scale Degree
 
+enum PlayableState {
+    case basic, intermediate, advanced, expert
+}
+
 enum WhistleScaleDegree: String, CaseIterable {
     case I = "I"
     case II = "II"
@@ -100,6 +105,70 @@ enum WhistleScaleDegree: String, CaseIterable {
     case VI2 = "VI²"
 
     var imageName: String { rawValue }
+    
+    /// Цвет на основе ступени (аналогично noteColor в PianoRollCursorView)
+    var color: Color {
+        // Получаем индекс ступени для вычисления hue
+        let degreeIndex: Int
+        switch self {
+        case .I: degreeIndex = 0
+        case .II: degreeIndex = 1
+        case .III: degreeIndex = 2
+        case .IV: degreeIndex = 3
+        case .V: degreeIndex = 4
+        case .VI: degreeIndex = 5
+        case .flatVII: degreeIndex = 6
+        case .VII: degreeIndex = 7
+        case .I2: degreeIndex = 8
+        case .II2: degreeIndex = 9
+        case .III2: degreeIndex = 10
+        case .IV2: degreeIndex = 11
+        case .V2: degreeIndex = 12
+        case .VI2: degreeIndex = 13
+        }
+        
+        // Используем похожую логику с hue, как в noteColor
+        let hue = Double(degreeIndex % 12) / 12.0
+        return Color(hue: hue * 0.3 + 0.55, saturation: 0.7, brightness: 0.75)
+    }
+    
+    var holesArray: [HoleState] {
+        switch self {
+        case .I: [.closed, .closed, .closed, .closed, .closed, .closed]
+        case .II: [.closed, .closed, .closed, .closed, .closed, .opened]
+        case .III: [.closed, .closed, .closed, .closed, .opened, .opened]
+        case .IV: [.closed, .closed, .closed, .opened, .opened, .opened]
+        case .V: [.closed, .closed, .opened, .opened, .opened, .opened]
+        case .VI: [.closed, .opened, .opened, .opened, .opened, .opened]
+        case .flatVII: [.opened, .closed, .opened, .opened, .opened, .opened] //ALT
+        case .VII: [.opened, .opened, .opened, .opened, .opened, .opened]
+        case .I2: [.closed, .closed, .closed, .closed, .closed, .closed, .closed] //ALT
+        case .II2: [.closed, .closed, .closed, .closed, .closed, .opened, .closed]
+        case .III2: [.closed, .closed, .closed, .closed, .opened, .opened, .closed]
+        case .IV2: [.closed, .closed, .closed, .opened, .opened, .opened, .closed]
+        case .V2: [.closed, .closed, .opened, .opened, .opened, .opened, .closed]
+        case .VI2: [.closed, .opened, .opened, .opened, .opened, .opened, .closed]
+        }
+    }
+    
+    var level: PlayableState {
+        switch self {
+        case .I: .basic
+        case .II: .basic
+        case .III: .basic
+        case .IV: .basic
+        case .V: .basic
+        case .VI: .basic
+        case .flatVII: .basic
+        case .VII: .basic
+        case .I2: .basic
+        case .II2: .basic
+        case .III2: .basic
+        case .IV2: .basic
+        case .V2: .basic
+        case .VI2: .basic
+        }
+    }
 }
 
 // MARK: - Pitch to Degree Converter

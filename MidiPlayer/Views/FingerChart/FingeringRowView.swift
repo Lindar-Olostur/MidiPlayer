@@ -22,7 +22,7 @@ struct FingeringRowView: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             // Фон для аппликатур
-            Color.white
+            Color.white.opacity(0.15)
             
             // Аппликатуры
             ForEach(notes) { note in
@@ -32,14 +32,15 @@ struct FingeringRowView: View {
                 FingeringImageView(
                     note: note,
                     width: width,
-                    whistleKey: whistleKey
+                    whistleKey: whistleKey,
+                    currentBeat: currentBeat
                 )
                 .frame(width: width, height: rowHeight - symbolRowHeight - 2)
                 .offset(x: x, y: 1)
                 .padding(.vertical, 8)
             }
         }
-        .frame(width: totalWidth, height: rowHeight)
+//        .frame(width: totalWidth, height: rowHeight)
         .offset(x: -offset)
     }
 }
@@ -48,7 +49,7 @@ struct FingeringRowView: View {
     FingeringRowView(
         notes: [
             MIDINote(pitch: 62, velocity: 80, startBeat: 0, duration: 2, channel: 0),
-            MIDINote(pitch: 64, velocity: 80, startBeat: 2, duration: 2, channel: 0)
+            MIDINote(pitch: 69, velocity: 80, startBeat: 2, duration: 2, channel: 0)
         ],
         currentBeat: 1,
         startBeatOffset: 0,
@@ -57,7 +58,7 @@ struct FingeringRowView: View {
         totalWidth: 200,
         offset: 0,
         isPlaying: false,
-        whistleKey: .D_high
+        whistleKey: .G
     )
     .frame(width: 200, height: 70)
     .background(Color.gray.opacity(0.1))
