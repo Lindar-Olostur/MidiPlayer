@@ -70,7 +70,7 @@ struct FileImportView: View {
                 .fontWeight(.bold)
                 .foregroundColor(.white)
             
-            Text("Выберите MIDI или ABC файл для загрузки")
+            Text("Выберите ABC файл для загрузки")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
@@ -136,7 +136,6 @@ struct FileImportView: View {
         .sheet(isPresented: $showPicker) {
             DocumentPicker(
                 allowedContentTypes: [
-                    .midi,
                     UTType(filenameExtension: "abc") ?? .data
                 ],
                 onDocumentPicked: { url in
@@ -173,7 +172,7 @@ struct TuneRowView: View {
                     .foregroundColor(.white)
                 
                 HStack(spacing: 12) {
-                    Label(tune.fileType.rawValue, systemImage: tune.fileType == .midi ? "music.note" : "doc.text")
+                    Label(tune.fileType.rawValue, systemImage: "doc.text")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.7))
                     

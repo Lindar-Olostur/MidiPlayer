@@ -148,8 +148,8 @@ class MIDISequencer {
     private func reloadMIDIFile(originalInfo: MIDIFileInfo, url: URL) {
         let wasPlaying = isPlaying
         let currentPos = currentBeat
+        let savedTempo = tempo
         
-        // Сохраняем выделенную область
         let savedStartMeasure = startMeasure
         let savedEndMeasure = endMeasure
         
@@ -157,7 +157,6 @@ class MIDISequencer {
             pause()
         }
         
-        // Применяем транспонирование к нотам для отображения
         let transposedNotes = originalInfo.allNotes.map { note in
             MIDINote(
                 pitch: UInt8(max(0, min(127, Int(note.pitch) + transpose))),
@@ -168,7 +167,6 @@ class MIDISequencer {
             )
         }
         
-        // Обновляем midiInfo с транспонированными нотами
         let minPitch = transposedNotes.map { $0.pitch }.min() ?? originalInfo.minPitch
         let maxPitch = transposedNotes.map { $0.pitch }.max() ?? originalInfo.maxPitch
         
@@ -190,11 +188,9 @@ class MIDISequencer {
             maxPitch: maxPitch
         )
         
-        // Создаём секвенс с транспонированными нотами
         createSequenceFromNotes(transposedNotes)
         
-        // Устанавливаем параметры
-        tempo = originalInfo.tempo
+        tempo = savedTempo
         
         // Восстанавливаем выделенную область
         startMeasure = min(savedStartMeasure, originalInfo.totalMeasures)
@@ -256,34 +252,30 @@ class MIDISequencer {
     func loadTune(at index: Int) {
         guard index >= 0 && index < abcTunes.count else { return }
 
+        let savedTempo = tempo
         selectedTuneIndex = index
         let tune = abcTunes[index]
 
-        // Сохраняем оригинальные данные (без транспонирования) для определения тональности
         let originalMIDIInfo = ABCParser.toMIDIFileInfo(tune, transpose: 0)
         self.originalMIDIInfo = originalMIDIInfo
-        self.originalMIDIURL = nil // Для ABC файлов URL не нужен
+        self.originalMIDIURL = nil
 
-        // Конвертируем в MIDIFileInfo (с учётом транспонирования для отображения)
         midiInfo = ABCParser.toMIDIFileInfo(tune, transpose: transpose)
 
-        // Создаём секвенс из нот
         createSequenceFromNotes(tune.notes)
 
-        // Устанавливаем параметры
-        tempo = 120 // Стандартный темп для рилов, можно настроить
+        tempo = savedTempo
         startMeasure = 1
         endMeasure = midiInfo?.totalMeasures ?? 1
 
         print("Loaded tune: \(tune.title) - \(tune.notes.count) notes, transpose: \(transpose)")
     }
     
-    /// Перезагружает текущую мелодию (при смене транспонирования)
     private func reloadCurrentTune() {
         let wasPlaying = isPlaying
         let currentPos = currentBeat
+        let savedTempo = tempo
         
-        // Сохраняем выделенную область
         let savedStartMeasure = startMeasure
         let savedEndMeasure = endMeasure
         
@@ -295,11 +287,10 @@ class MIDISequencer {
             loadTune(at: selectedTuneIndex)
         }
         
-        // Восстанавливаем выделенную область
+        tempo = savedTempo
         startMeasure = min(savedStartMeasure, totalMeasures)
         endMeasure = min(savedEndMeasure, totalMeasures)
         
-        // Восстанавливаем позицию
         if currentPos > 0 {
             setPosition(min(currentPos, endBeat))
         }

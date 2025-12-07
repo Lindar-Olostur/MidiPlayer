@@ -32,41 +32,28 @@ class TuneManager: ObservableObject {
     /// Загружает файл с устройства
     func importFile(from url: URL) -> TuneModel? {
         let fileExtension = url.pathExtension.lowercased()
-        guard fileExtension == "mid" || fileExtension == "abc" else { return nil }
+        guard fileExtension == "abc" else { return nil }
         
         let id = UUID()
         let fileName = "tune_\(id.uuidString).\(fileExtension)"
         let destinationURL = tunesDirectory.appendingPathComponent(fileName)
         
         do {
-            // Копируем файл
             try FileManager.default.copyItem(at: url, to: destinationURL)
             
-            // Создаём модель
-            let sourceType: SourceType = fileExtension == "mid" ? .midi : .abc
             var tune = TuneModel(
                 id: id,
                 fileName: fileName,
-                fileType: sourceType,
+                fileType: .abc,
                 originalFileName: url.lastPathComponent,
                 dateAdded: Date()
             )
             
-            // Парсим метаданные
-            if sourceType == .midi {
-                if let info = MIDIParser.parse(url: destinationURL) {
-                    tune.tempo = info.tempo
-                    tune.detectedKey = KeyDetector.detectKey(from: info.allNotes)
-                    tune.endMeasure = info.totalMeasures
-                    tune.title = url.deletingPathExtension().lastPathComponent
-                }
-            } else {
-                if let abcTunes = ABCParser.parseFile(url: destinationURL), !abcTunes.isEmpty {
-                    let firstTune = abcTunes[0]
-                    tune.title = firstTune.title
-                    tune.detectedKey = firstTune.key
-                    tune.selectedTuneIndex = 0
-                }
+            if let abcTunes = ABCParser.parseFile(url: destinationURL), !abcTunes.isEmpty {
+                let firstTune = abcTunes[0]
+                tune.title = firstTune.title
+                tune.detectedKey = firstTune.key
+                tune.selectedTuneIndex = 0
             }
             
             tunes.append(tune)

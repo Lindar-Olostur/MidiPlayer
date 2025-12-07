@@ -22,7 +22,7 @@ struct TuneAndWhistleSectionView: View {
                 WhistleKeyPicker(whistleKey: $whistleKey)
 
                 // Доступные тональности мелодии для выбранного вистла
-                if !playableKeys.isEmpty && viewMode == .fingerChart {
+                if !playableKeys.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             ForEach(playableKeys, id: \.self) { key in

@@ -31,7 +31,7 @@ enum ViewMode: String, CaseIterable {
 struct ContentView: View {
     @State private var orientation = OrientationService()
     @State private var sequencer = MIDISequencer()
-    @State private var sourceType: SourceType = .midi
+    @State private var sourceType: SourceType = .abc
     @State private var viewMode: ViewMode = .fingerChart
     @State private var whistleKey: WhistleKey = .D_high
     @State private var playableKeyVariants: [WhistleConverter.PlayableKeyVariant] = []
@@ -54,11 +54,11 @@ struct ContentView: View {
                 endPoint: .bottom
             )
             .ignoresSafeArea()
-            if orientation.currentOrientation == .portrait {
+//            if orientation.currentOrientation == .portrait {
                 portrait
-            } else {
-                landscape
-            }
+//            } else {
+//                landscape
+//            }
         }
         .onAppear {
             // Загружаем последнюю мелодию или дефолтную
@@ -67,12 +67,12 @@ struct ContentView: View {
             } else {
                 loadSource(sourceType)
             }
-            orientation.setupOrientationObserver()
-            AppDelegate.orientationLock = .all
+//            orientation.setupOrientationObserver()
+//            AppDelegate.orientationLock = .all
         }
         .onDisappear {
-            orientation.removeOrientationObserver()
-            AppDelegate.orientationLock = .portrait
+//            orientation.removeOrientationObserver()
+//            AppDelegate.orientationLock = .portrait
         }
         .onChange(of: sequencer.selectedTuneIndex) { _, _ in
             updateWhistleKeyFromTune()
@@ -284,35 +284,27 @@ struct ContentView: View {
     }
     
     private var currentTuneName: String? {
-        // Если есть загруженная мелодия из файла, используем её название
         if let tuneId = currentTuneId, let tune = tuneManager.tunes.first(where: { $0.id == tuneId }) {
             return tune.title ?? tune.originalFileName
         }
         
-        // Иначе используем старую логику для bundle файлов
         if sourceType == .abc && !sequencer.abcTunes.isEmpty {
             return sequencer.abcTunes[sequencer.selectedTuneIndex].title
-        } else if sourceType == .midi {
-            return "Silver Spear (MIDI)"
         }
         return nil
     }
     
     private var currentTuneKey: String {
-        // Определяем тональность по оригинальным нотам (до транспонирования)
         if let originalInfo = sequencer.originalTuneInfo {
-            // Для MIDI используем оригинальные ноты
             return KeyDetector.detectKey(from: originalInfo.allNotes)
-        } else if let midiInfo = sequencer.midiInfo, sequencer.abcTunes.isEmpty {
-            // Для MIDI без оригинальных данных (старый код)
-            return KeyDetector.detectKey(from: midiInfo.allNotes)
         } else if !sequencer.abcTunes.isEmpty {
-            // Для ABC мелодий используем ключ из файла (если есть) или анализируем
             if let firstTune = sequencer.abcTunes.first, !firstTune.key.isEmpty {
                 return firstTune.key
             } else if let midiInfo = sequencer.midiInfo {
                 return KeyDetector.detectKey(from: midiInfo.allNotes)
             }
+        } else if let midiInfo = sequencer.midiInfo {
+            return KeyDetector.detectKey(from: midiInfo.allNotes)
         }
         return "C"
     }
@@ -321,18 +313,12 @@ struct ContentView: View {
     
     /// Загружает новую импортированную мелодию с автоматическим транспонированием в C4
     private func loadNewImportedTune(_ tune: TuneModel) {
-        // Загружаем БЕЗ установки currentTuneId, чтобы применить автотранспонирование
         sourceType = tune.fileType
         sequencer.stop()
         
-        // Загружаем файл
         let fileURL = tuneManager.fileURL(for: tune)
-        if tune.fileType == .midi {
-            sequencer.loadMIDIFile(url: fileURL)
-        } else {
-            sequencer.loadABCFile(url: fileURL)
-            sequencer.selectedTuneIndex = tune.selectedTuneIndex
-        }
+        sequencer.loadABCFile(url: fileURL)
+        sequencer.selectedTuneIndex = tune.selectedTuneIndex
         
         // Устанавливаем строй вистла и применяем транспонирование в C4
         whistleKey = WhistleKey.from(tuneKey: currentTuneKey)
@@ -368,7 +354,6 @@ struct ContentView: View {
         sequencer.startMeasure = tune.startMeasure
         sequencer.endMeasure = tune.endMeasure
         
-        // Загружаем файл
         let fileURL = tuneManager.fileURL(for: tune)
         if tune.fileType == .midi {
             sequencer.loadMIDIFile(url: fileURL)
@@ -377,8 +362,6 @@ struct ContentView: View {
             sequencer.selectedTuneIndex = tune.selectedTuneIndex
         }
         
-        // Устанавливаем строй вистла по тональности мелодии
-        // Для сохраненных мелодий не применяем автотранспонирование
         updateWhistleKeyFromTune(applyAutoTranspose: false)
         
         // Восстанавливаем выбранную тональность если есть
@@ -414,10 +397,10 @@ struct ContentView: View {
         sequencer.transpose = 0
         
         switch source {
-        case .midi:
-            sequencer.loadMIDIFile(named: "silverspear")
         case .abc:
-            sequencer.loadABCFile(named: "ievanpolkka")//TODO
+            sequencer.loadABCFile(named: "ievanpolkka")
+        case .midi:
+            break
         }
         // Устанавливаем строй вистла по тональности мелодии
         updateWhistleKeyFromTune()

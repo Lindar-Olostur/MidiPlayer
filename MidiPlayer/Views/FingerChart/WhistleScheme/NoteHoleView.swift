@@ -70,6 +70,6 @@ struct NoteHoleView: View {
 }
 
 #Preview {
-    NoteHoleView(state: .closed, isActive: false, isSelfColored: true)
+    NoteHoleView(state: .closed, isActive: true, isSelfColored: true)
         .frame(width: 130, height: 130)
 }

@@ -37,19 +37,27 @@ struct ApplicatureView: View {
             )
             
             VStack(alignment: .center, spacing: holeSpacing) {
-                NoteHoleView(state: note.holesArray[0], size: holeSize, isActive: isActive, isSelfColored: colored)
-                NoteHoleView(state: note.holesArray[1], size: holeSize, isActive: isActive, isSelfColored: colored)
-                NoteHoleView(state: note.holesArray[2], size: holeSize, isActive: isActive, isSelfColored: colored)
-                    .padding(.bottom, -circleStrokeWidth * 0.6)
+                Group {
+                    NoteHoleView(state: note.holesArray[0], size: holeSize, isActive: isActive, isSelfColored: colored)
+                    NoteHoleView(state: note.holesArray[1], size: holeSize, isActive: isActive, isSelfColored: colored)
+                    NoteHoleView(state: note.holesArray[2], size: holeSize, isActive: isActive, isSelfColored: colored)
+                        .padding(.bottom, -circleStrokeWidth * 0.6)
+                }
+                .shadow(color: Color.orange.opacity((note == .VII && isActive) ? 1 : 0), radius: 2)
+                .animation(.easeInOut(duration: 0.1), value: isActive)
                 
                 Rectangle()
                     .fill(theme.colors.divider)
                     .frame(width: holeSize * 1.1, height: circleStrokeWidth * 0.8)
                 
-                NoteHoleView(state: note.holesArray[3], size: holeSize, isActive: isActive, isSelfColored: colored)
-                    .padding(.top, -circleStrokeWidth * 0.6)
-                NoteHoleView(state: note.holesArray[4], size: holeSize, isActive: isActive, isSelfColored: colored)
-                NoteHoleView(state: note.holesArray[5], size: holeSize, isActive: isActive, isSelfColored: colored)
+                Group {
+                    NoteHoleView(state: note.holesArray[3], size: holeSize, isActive: isActive, isSelfColored: colored)
+                        .padding(.top, -circleStrokeWidth * 0.6)
+                    NoteHoleView(state: note.holesArray[4], size: holeSize, isActive: isActive, isSelfColored: colored)
+                    NoteHoleView(state: note.holesArray[5], size: holeSize, isActive: isActive, isSelfColored: colored)
+                }
+                .shadow(color: Color.orange.opacity((note == .VII && isActive) ? 1 : 0), radius: 2)
+                .animation(.easeInOut(duration: 0.1), value: isActive)
                 
                 Group {
                     if colored && isActive {
@@ -102,7 +110,7 @@ struct ApplicatureView: View {
 #Preview {
     HStack(spacing: 20) {
         // Маленький размер
-        ApplicatureView(note: .V2, isActive: true, colored: true)
+        ApplicatureView(note: .VII, isActive: true, colored: true)
             .frame(width: 40, height: 200)
 //            .background(.red.opacity(0.2))
         
