@@ -13,7 +13,8 @@ struct OBFooterView: View {
                 openURL(URL(string: termsOfUse)!)
             } label: {
                 Text("Terms of Use")
-                    .styled(as: .footnote, color: color)
+                    .font(.footnote)
+                    .foregroundStyle(color)
                     .fixedSize()
                     .padding(16)
                     .frame(maxWidth: .infinity)
@@ -28,7 +29,8 @@ struct OBFooterView: View {
                 }
             } label: {
                 Text("Restore")
-                    .styled(as: .footnote, color: color)
+                    .font(.footnote)
+                    .foregroundStyle(color)
                     .fixedSize()
                     .padding(16)
                     .frame(maxWidth: .infinity)
@@ -38,7 +40,8 @@ struct OBFooterView: View {
                 openURL(URL(string: privacyPolicy)!)
             } label: {
                 Text("Privacy Policy")
-                    .styled(as: .footnote, color: color)
+                    .font(.footnote)
+                    .foregroundStyle(color)
                     .fixedSize()
                     .padding(16)
                     .frame(maxWidth: .infinity)

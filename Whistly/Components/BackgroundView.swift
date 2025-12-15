@@ -1,15 +1,16 @@
-//
-//  BackgroundView.swift
-//  Whistly
-//
-//  Created by Lindar Olostur on 14.12.2025.
-//
-
 import SwiftUI
 
 struct BackgroundView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Color.bgPrimary.ignoresSafeArea()
+            .overlay {
+                Circle()
+                    .fill(.accentPrimary)
+                    .padding(32)
+                    .blur(radius: 130)
+                    .opacity(0.45)
+                Color.black.opacity(0.1)
+            }
     }
 }
 

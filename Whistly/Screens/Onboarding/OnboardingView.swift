@@ -16,8 +16,8 @@ struct OnboardingView: View {
     }
     @State var isRestoring = false
     @State var obStep = OBScreen.first
-    let titles = ["Compress\nyour media", "Loved by\nour users", "Advanced\ncompression tools"]
-    let subtitles = ["Easily compress photos, videos, or both\nat the same time to save space", "Thousands of users trust our app to keep\ntheir devices clutter-free and fast", "Customize resolution, bitrate, and\nformats to get perfect results every time"]
+    let titles = ["Easily learn tunes on the\ntin whistle", "It's genuinely useful and\nconvenient.", "Choose the mode that suits\nyou best."]
+    let subtitles = ["Upload ABC tunes, and automatically\ngenerate fingerings for any key.", "Thousands of users are already playing\ntheir favorite tunes effortlessly.", "For any skill level, for any whistle,for any\nmelody."]
     
     var body: some View {
         VStack(spacing: 0) {
@@ -25,11 +25,12 @@ struct OnboardingView: View {
             VStack(alignment: .center, spacing: 16) {
                     Group {
                         Text(titles[obStep.rawValue])
-                            .styled(as: .title1)
+                            .font(.title)
                             .fixedSize()
                             .padding(.top, 4)
                         Text(subtitles[obStep.rawValue])
-                            .styled(as: .body)
+                            .font(.body)
+                            .foregroundStyle(.textSecondary)
                     }
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
@@ -44,31 +45,33 @@ struct OnboardingView: View {
                             }
                         }
                     } label: {
-                        Text("Continue").styled(as: .button)
+                        Text("Continue").font(.body)
+                            .foregroundStyle(.textPrimary)
                     }
                     OBFooterView(isRestoring: .constant(false))
             }
             .frame(maxWidth: UIDevice.isIPad ? 464 : .infinity)
             .padding(16)
-            .background(.fillTertiary)
+            .background(.fillQuartenary)
             .clipShape(RoundedCorner(radius: 26, corners: [.topLeft, .topRight]))
         }
         .background {
-            Group {
-                switch obStep {
-                case .first: Image(.ob1)
-                        .resizable()
-                        .scaledToFill()
-                case .second:
-                    Image(.ob2)
-                        .resizable()
-                        .scaledToFill()
-                case .third:
-                    Image(.ob3)
-                        .resizable()
-                        .scaledToFill()
-                }
-            }
+            BackgroundView()
+//            Group { TODO
+//                switch obStep {
+//                case .first: Image(".ob1")
+//                        .resizable()
+//                        .scaledToFill()
+//                case .second:
+//                    Image(".ob2")
+//                        .resizable()
+//                        .scaledToFill()
+//                case .third:
+//                    Image(".ob3")
+//                        .resizable()
+//                        .scaledToFill()
+//                }
+//            }
         }
         .ignoresSafeArea()
     }

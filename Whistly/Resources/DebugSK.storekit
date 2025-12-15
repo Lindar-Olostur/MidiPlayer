@@ -14,7 +14,21 @@
 
   ],
   "products" : [
-
+    {
+      "displayPrice" : "119.99",
+      "familyShareable" : false,
+      "internalID" : "71D7CE5F",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "detector_purchase",
+      "referenceName" : "lifetime",
+      "type" : "NonConsumable"
+    }
   ],
   "settings" : {
     "_failTransactionsEnabled" : false,
@@ -95,7 +109,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "calorie_week",
+          "productID" : "detector_week",
           "recurringSubscriptionPeriod" : "P1W",
           "referenceName" : "week 4.99",
           "subscriptionGroupID" : "575DEE1B",
@@ -127,7 +141,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "calorie_week_trial",
+          "productID" : "detector_week_trial",
           "recurringSubscriptionPeriod" : "P1W",
           "referenceName" : "week 4.99 trial",
           "subscriptionGroupID" : "575DEE1B",

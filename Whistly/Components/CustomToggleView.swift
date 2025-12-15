@@ -10,7 +10,6 @@ struct CustomToggleView<T: AnimatedTab>: View {
     let spacing: CGFloat
     let bgColor: Color
     let buttonColor: Color
-    let textStyle: TextStyle
     let textColor: Color
     let radius: CGFloat
     let height: CGFloat
@@ -21,7 +20,6 @@ struct CustomToggleView<T: AnimatedTab>: View {
         spacing: CGFloat = 0,
         bgColor: Color = .fillQuartenary,
         buttonColor: Color = .fillPrimary,
-        textStyle: TextStyle = .body,
         textColor: Color = .textPrimary,
         radius: CGFloat = .infinity,
         height: CGFloat = 44,
@@ -31,7 +29,6 @@ struct CustomToggleView<T: AnimatedTab>: View {
         self.spacing = spacing
         self.bgColor = bgColor
         self.buttonColor = buttonColor
-        self.textStyle = textStyle
         self.textColor = textColor
         self.radius = radius
         self.height = height
@@ -50,11 +47,11 @@ struct CustomToggleView<T: AnimatedTab>: View {
                     } label: {
                         VStack(alignment: .center, spacing: 4) {
                             Text(isComplesLabel ? tab.title : tab.rawValue)
-                                .styled(as: .body, color: .textPrimary)
+                                .font(.body)
                                 .multilineTextAlignment(.center)
                             if isComplesLabel {
                                 Text(tab.description)
-                                    .styled(as: .caption, color: .textPrimary)
+                                    .font(.caption)
                                     .multilineTextAlignment(.center)
                             }
                         }
@@ -80,7 +77,7 @@ struct CustomToggleView<T: AnimatedTab>: View {
             )
             
             RoundedRectangle(cornerRadius: radius)
-                .foregroundStyle(LinearGradient.primary)
+                .foregroundStyle(.accentPrimary)
                 .frame(width: tabWidth)
                 .offset(x: selectedIndex * (tabWidth + spacing))
                 .animation(
@@ -93,7 +90,7 @@ struct CustomToggleView<T: AnimatedTab>: View {
 
 #Preview {
     CustomToggleView(
-        selectedTab: .constant(OriginalFilesOptions.keepAlways),
+        selectedTab: .constant(TestEnum.home),
                         spacing: 4,
         bgColor: .red, height: 66
                     )

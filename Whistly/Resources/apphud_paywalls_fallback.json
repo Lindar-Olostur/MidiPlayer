@@ -2,7 +2,7 @@
   "data": {
     "results": [
       {
-        "id": "9880bb2e",
+        "id": "94b88b24",
         "json": null,
         "screen": null,
         "name": "paywall",
@@ -15,34 +15,49 @@
         "variation_name": null,
         "items_v2": [
           {
-            "id": "b95cb50f",
-            "item_id": "d9331214-afd3-462f-a827-f81f7dd15dac",
+            "id": "b441cba7",
+            "item_id": "36ce63ac-bf84-4f2b-a0aa-0472082c80d7",
             "name": "week 4.99",
-            "product_id": "calorie_week",
+            "product_id": "detector_week",
             "store": "app_store"
           },
           {
-            "id": "17440aed",
-            "item_id": "cda96255-27e1-4b38-b17d-4be4097052ff",
+            "id": "af8f0ead",
+            "item_id": "8c134517-7252-4d22-a8b2-cb3e86373e7b",
             "name": "week 4.99 trial",
-            "product_id": "calorie_week_trial",
+            "product_id": "detector_week_trial",
+            "store": "app_store"
+          },
+          {
+            "id": "6e45f71d",
+            "item_id": "dcbefa31-f6eb-49c2-9a6f-956cb1cea4f8",
+            "name": "lifetime 119.99",
+            "product_id": "detector_purchase",
             "store": "app_store"
           }
         ],
         "items": [
           {
-            "id": "b95cb50f",
-            "item_id": "d9331214-afd3-462f-a827-f81f7dd15dac",
+            "id": "b441cba7",
+            "item_id": "36ce63ac-bf84-4f2b-a0aa-0472082c80d7",
             "name": "week 4.99",
-            "product_id": "calorie_week",
+            "product_id": "detector_week",
             "store": "app_store",
             "properties": {}
           },
           {
-            "id": "17440aed",
-            "item_id": "cda96255-27e1-4b38-b17d-4be4097052ff",
+            "id": "af8f0ead",
+            "item_id": "8c134517-7252-4d22-a8b2-cb3e86373e7b",
             "name": "week 4.99 trial",
-            "product_id": "calorie_week_trial",
+            "product_id": "detector_week_trial",
+            "store": "app_store",
+            "properties": {}
+          },
+          {
+            "id": "6e45f71d",
+            "item_id": "dcbefa31-f6eb-49c2-9a6f-956cb1cea4f8",
+            "name": "lifetime 119.99",
+            "product_id": "detector_purchase",
             "store": "app_store",
             "properties": {}
           }
@@ -53,4 +68,3 @@
   },
   "errors": null
 }
-
