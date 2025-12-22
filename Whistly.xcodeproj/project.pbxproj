@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5D01F24E2EF9B4F0005B0A94 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D01F24D2EF9B4F0005B0A94 /* AuthService.swift */; };
+		5D01F2502EF9B522005B0A94 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D01F24F2EF9B522005B0A94 /* SettingsView.swift */; };
+		5D01F2522EF9B555005B0A94 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D01F2512EF9B555005B0A94 /* AuthView.swift */; };
+		5D01F2552EF9B90E005B0A94 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 5D01F2542EF9B90E005B0A94 /* FirebaseAuth */; };
+		5D01F2572EF9B930005B0A94 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 5D01F2562EF9B930005B0A94 /* FirebaseFirestore */; };
+		5D01F2592EF9BB89005B0A94 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5D01F2582EF9BB89005B0A94 /* GoogleService-Info.plist */; };
 		5D74FB652EF154BA002DD315 /* MainContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D74FB642EF154B9002DD315 /* MainContainer.swift */; };
 		5D74FB672EF15AFD002DD315 /* TuneStoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D74FB662EF15AFD002DD315 /* TuneStoreManager.swift */; };
 		5D74FB692EF16030002DD315 /* testTune.abc in Resources */ = {isa = PBXBuildFile; fileRef = 5D74FB682EF16030002DD315 /* testTune.abc */; };
@@ -64,14 +70,15 @@
 		5DDF63DE2EF03E6700B8AB9C /* PurchasesToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DDF63D92EF03E6700B8AB9C /* PurchasesToggle.swift */; };
 		5DDF63E02EF03F0200B8AB9C /* PWFeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DDF63DF2EF03F0200B8AB9C /* PWFeatureView.swift */; };
 		5DDF63E22EF0430E00B8AB9C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DDF63E12EF0430E00B8AB9C /* ContentView.swift */; };
-		5DDF63E72EF0669400B8AB9C /* RegistrationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DDF63E62EF0669400B8AB9C /* RegistrationManager.swift */; };
-		5DDF63E92EF066D700B8AB9C /* LoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DDF63E82EF066D700B8AB9C /* LoginManager.swift */; };
-		5DDF63EB2EF067AE00B8AB9C /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DDF63EA2EF067AE00B8AB9C /* MainViewModel.swift */; };
 		5DDF63ED2EF07CBA00B8AB9C /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DDF63EC2EF07CBA00B8AB9C /* MainView.swift */; };
 		5DDF63F22EF095CA00B8AB9C /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DDF63F12EF095CA00B8AB9C /* Models.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5D01F24D2EF9B4F0005B0A94 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		5D01F24F2EF9B522005B0A94 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		5D01F2512EF9B555005B0A94 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
+		5D01F2582EF9BB89005B0A94 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		5D1FB9FB2EEED5A200E13569 /* Whistly.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Whistly.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D74FB642EF154B9002DD315 /* MainContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContainer.swift; sourceTree = "<group>"; };
 		5D74FB662EF15AFD002DD315 /* TuneStoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneStoreManager.swift; sourceTree = "<group>"; };
@@ -127,9 +134,6 @@
 		5DDF63D92EF03E6700B8AB9C /* PurchasesToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchasesToggle.swift; sourceTree = "<group>"; };
 		5DDF63DF2EF03F0200B8AB9C /* PWFeatureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PWFeatureView.swift; sourceTree = "<group>"; };
 		5DDF63E12EF0430E00B8AB9C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		5DDF63E62EF0669400B8AB9C /* RegistrationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationManager.swift; sourceTree = "<group>"; };
-		5DDF63E82EF066D700B8AB9C /* LoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginManager.swift; sourceTree = "<group>"; };
-		5DDF63EA2EF067AE00B8AB9C /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
 		5DDF63EC2EF07CBA00B8AB9C /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		5DDF63F12EF095CA00B8AB9C /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -142,16 +146,26 @@
 				5D8754902EEEDD1000972A1D /* AudioKitEX in Frameworks */,
 				5D87548D2EEEDD0600972A1D /* AudioKit in Frameworks */,
 				5D87548A2EEEDCFD00972A1D /* ApphudBase in Frameworks */,
+				5D01F2572EF9B930005B0A94 /* FirebaseFirestore in Frameworks */,
+				5D01F2552EF9B90E005B0A94 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5D01F2532EF9B90E005B0A94 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		5D1FB9F22EEED5A200E13569 = {
 			isa = PBXGroup;
 			children = (
 				5D8754812EEED73F00972A1D /* Whistly */,
+				5D01F2532EF9B90E005B0A94 /* Frameworks */,
 				5D1FB9FC2EEED5A200E13569 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -298,6 +312,7 @@
 			children = (
 				5DDF63EE2EF0862600B8AB9C /* Main */,
 				5DDF63E12EF0430E00B8AB9C /* ContentView.swift */,
+				5D01F24F2EF9B522005B0A94 /* SettingsView.swift */,
 				5D8754A72EEEDD9900972A1D /* Launch */,
 				5D8754B22EEEE6F500972A1D /* Onboarding */,
 				5DDF63DA2EF03E6700B8AB9C /* Paywall */,
@@ -319,6 +334,7 @@
 				5D87547E2EEED73F00972A1D /* Screens */,
 				5D87547F2EEED73F00972A1D /* Assets.xcassets */,
 				5D8754802EEED73F00972A1D /* WhistlyApp.swift */,
+				5D01F2582EF9BB89005B0A94 /* GoogleService-Info.plist */,
 			);
 			path = Whistly;
 			sourceTree = "<group>";
@@ -372,6 +388,7 @@
 		5DDF63E32EF043FD00B8AB9C /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				5D01F2512EF9B555005B0A94 /* AuthView.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -379,9 +396,7 @@
 		5DDF63E52EF0668900B8AB9C /* Auth */ = {
 			isa = PBXGroup;
 			children = (
-				5DDF63EA2EF067AE00B8AB9C /* MainViewModel.swift */,
-				5DDF63E82EF066D700B8AB9C /* LoginManager.swift */,
-				5DDF63E62EF0669400B8AB9C /* RegistrationManager.swift */,
+				5D01F24D2EF9B4F0005B0A94 /* AuthService.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -418,6 +433,8 @@
 				5D8754892EEEDCFD00972A1D /* ApphudBase */,
 				5D87548C2EEEDD0600972A1D /* AudioKit */,
 				5D87548F2EEEDD1000972A1D /* AudioKitEX */,
+				5D01F2542EF9B90E005B0A94 /* FirebaseAuth */,
+				5D01F2562EF9B930005B0A94 /* FirebaseFirestore */,
 			);
 			productName = Whistly;
 			productReference = 5D1FB9FB2EEED5A200E13569 /* Whistly.app */;
@@ -473,6 +490,7 @@
 				5D8754AF2EEEE61B00972A1D /* LaunchScreen.storyboard in Resources */,
 				5D8754A42EEEDD8700972A1D /* apphud_paywalls_fallback.json in Resources */,
 				5D8754832EEED73F00972A1D /* Assets.xcassets in Resources */,
+				5D01F2592EF9BB89005B0A94 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,6 +509,7 @@
 				5D7EC5B12EF5BFC100226693 /* PlaybackControlsSectionView.swift in Sources */,
 				5DCA56F82EF7D93B006D306B /* MeasureSelectorView.swift in Sources */,
 				5D7EC5AF2EF59A6A00226693 /* GridBackground.swift in Sources */,
+				5D01F2522EF9B555005B0A94 /* AuthView.swift in Sources */,
 				5D74FB792EF17571002DD315 /* MIDIParser.swift in Sources */,
 				5D7EC5A02EF583BD00226693 /* TuneAndWhistleSectionView.swift in Sources */,
 				5D7EC5A22EF5843C00226693 /* WhistleKeyPicker.swift in Sources */,
@@ -502,9 +521,9 @@
 				5D8754962EEEDD3A00972A1D /* Image+.swift in Sources */,
 				5D8754942EEEDD3300972A1D /* ApphudProduct+.swift in Sources */,
 				5D8754B32EEEE6F500972A1D /* OnboardingView.swift in Sources */,
+				5D01F24E2EF9B4F0005B0A94 /* AuthService.swift in Sources */,
 				5D74FB652EF154BA002DD315 /* MainContainer.swift in Sources */,
 				5D8754B42EEEE6F500972A1D /* OBFooterView.swift in Sources */,
-				5DDF63EB2EF067AE00B8AB9C /* MainViewModel.swift in Sources */,
 				5D74FB812EF175FE002DD315 /* NoteHoleView.swift in Sources */,
 				5D74FB822EF175FE002DD315 /* FingeringImageView.swift in Sources */,
 				5D74FB832EF175FE002DD315 /* FingerChartView.swift in Sources */,
@@ -521,18 +540,17 @@
 				5D8754B62EEEE7E500972A1D /* RoundedCorner.swift in Sources */,
 				5D8754852EEEDCBF00972A1D /* NavigationManager.swift in Sources */,
 				5DDF63E22EF0430E00B8AB9C /* ContentView.swift in Sources */,
-				5DDF63E72EF0669400B8AB9C /* RegistrationManager.swift in Sources */,
 				5D8754982EEEDD3F00972A1D /* UIDevice+.swift in Sources */,
 				5D8754922EEEDD2700972A1D /* ConfigData.swift in Sources */,
 				5DCA56F42EF71175006D306B /* ModelTest.swift in Sources */,
 				5D74FB772EF17556002DD315 /* MIDISequencer.swift in Sources */,
 				5D8754AD2EEEE3D400972A1D /* Gradient+.swift in Sources */,
-				5DDF63E92EF066D700B8AB9C /* LoginManager.swift in Sources */,
 				5D87549E2EEEDD7200972A1D /* CustomToggleView.swift in Sources */,
 				5DDF63DC2EF03E6700B8AB9C /* PaywallListView.swift in Sources */,
 				5DDF63DD2EF03E6700B8AB9C /* PaywallView.swift in Sources */,
 				5D74FB672EF15AFD002DD315 /* TuneStoreManager.swift in Sources */,
 				5D74FB722EF17526002DD315 /* KeyCalculator.swift in Sources */,
+				5D01F2502EF9B522005B0A94 /* SettingsView.swift in Sources */,
 				5DDF63DE2EF03E6700B8AB9C /* PurchasesToggle.swift in Sources */,
 				5D74FB872EF17628002DD315 /* FingerChartStyleManager.swift in Sources */,
 				5D87549F2EEEDD7200972A1D /* BigButton.swift in Sources */,
@@ -790,6 +808,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5D01F2542EF9B90E005B0A94 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5DDF63E42EF0610500B8AB9C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		5D01F2562EF9B930005B0A94 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5DDF63E42EF0610500B8AB9C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
 		5D8754892EEEDCFD00972A1D /* ApphudBase */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ApphudBase;

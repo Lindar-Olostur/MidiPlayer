@@ -14,7 +14,6 @@ final class NavigationManager {
             }
         }
     var openMainPaywall: Bool = false
-    var openSettings: Bool = false
    
     @MainActor func splashFinished() {
         if onCompleted {

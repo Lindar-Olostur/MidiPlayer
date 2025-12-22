@@ -9,6 +9,7 @@ final class MainContainer {
     var storage = TuneStoreManager()
     var sequencer = MIDISequencer()
     var userSettings = UserSettings()
+    var authService = AuthService()
 }
 
 final class UserSettings {

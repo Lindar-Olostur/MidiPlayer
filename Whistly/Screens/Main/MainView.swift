@@ -12,6 +12,7 @@ struct MainView: View {
     
     
     
+    @State private var openSettings: Bool = false
     @State private var openTuneManager = false
     @State private var viewMode: ViewMode = .fingerChart
     
@@ -52,20 +53,8 @@ struct MainView: View {
                         Text("Load")
                         Image(systemName: "square.and.arrow.up")
                     }
-//                    Button {
-//                        // TODO Save/Load Tunes
-//                    } label: {
-//                        Text("Open Tune")
-//                        Image(systemName: "music.note")
-//                    }
-//                    Button {
-//                        // TODO Save/Load Sets
-//                    } label: {
-//                        Text("Open Set")
-//                        Image(systemName: "music.note.list")
-//                    }
                     Button {
-                        // TODO Settings
+                        openSettings.toggle()
                     } label: {
                         Text("Settings")
                         Image(systemName: "gearshape.fill")
@@ -111,6 +100,10 @@ struct MainView: View {
         }
         .fullScreenCover(isPresented: $openTuneManager) {
             TuneManagerView()
+        }
+        .fullScreenCover(isPresented: $openSettings) {
+            SettingsView()
+                .environment(viewModel.authService)
         }
         .onAppear {
             #if DEBUG

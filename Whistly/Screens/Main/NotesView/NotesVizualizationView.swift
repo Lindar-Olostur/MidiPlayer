@@ -8,7 +8,7 @@ struct NotesVizualizationView: View {
         GeometryReader { geometry in
             let allCases = Array(ViewMode.allCases)
             let count = CGFloat(allCases.count)
-            let buttonWidth = (geometry.size.width - 8) / count
+            let buttonWidth = (geometry.size.width) / count
             let selectedIndex = CGFloat(
                 allCases.firstIndex(of: viewMode) ?? 0
             )
@@ -16,7 +16,7 @@ struct NotesVizualizationView: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(LinearGradient.primary)
                 .frame(width: buttonWidth)
-                .offset(x: 4 + selectedIndex * buttonWidth)
+                .offset(x: selectedIndex * buttonWidth)
                 .animation(
                     .spring(response: 0.3, dampingFraction: 0.7),
                     value: viewMode
