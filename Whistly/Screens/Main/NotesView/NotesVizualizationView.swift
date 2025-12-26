@@ -35,7 +35,7 @@ struct NotesVizualizationView: View {
             HStack(spacing: 0) {
                 ForEach(ViewMode.allCases, id: \.self) { mode in
                     Button(action: {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            withAnimation() {
                             viewMode = mode
                         }
                     }) {
@@ -58,21 +58,14 @@ struct NotesVizualizationView: View {
             }
             .frame(width: 256, height: 44)
             if let midiInfo = viewModel.sequencer.midiInfo {
-                TabView(selection: $viewMode) {
-                    ForEach(ViewMode.allCases, id: \.self) { mode in
-                        Group {
-                            switch mode {
-                            case .pianoRoll:
-                                PianoRollView(midiInfo: midiInfo)
-                            case .fingerChart:
-                                FingerChartView(midiInfo: midiInfo, whistleKey: viewModel.storage.loadedTune?.whistleKey ?? viewModel.userSettings.defaultWhistleKey)
-                            }
-                        }
-                        .tag(mode)
-                        .frame(height: 156)
+                Group {
+                    switch viewMode {
+                    case .pianoRoll:
+                        PianoRollView(midiInfo: midiInfo)
+                    case .fingerChart:
+                        FingerChartView(midiInfo: midiInfo, whistleKey: viewModel.storage.loadedTune?.whistleKey ?? viewModel.userSettings.defaultWhistleKey)
                     }
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
                 .frame(height: 156)
                 .background(Color.clear)
                 .clipped()

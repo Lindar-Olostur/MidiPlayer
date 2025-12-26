@@ -10,6 +10,7 @@ final class MainContainer {
     var sequencer = MIDISequencer()
     var userSettings = UserSettings()
     var authService = AuthService()
+    var scrollManager = ScrollManager()
 }
 
 final class UserSettings {

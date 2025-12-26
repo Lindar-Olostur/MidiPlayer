@@ -94,9 +94,9 @@ class AuthService {
         do {
             print("💾 Отправка в Firestore...")
             print("   Путь: \(collection)/\(userId)")
-            
-            try await db.collection(collection)
-                .document(userId)
+        
+        try await db.collection(collection)
+            .document(userId)
                 .setData(encodedData, merge: true)
             
             print("✅ Данные успешно сохранены в Firestore")
@@ -116,23 +116,34 @@ class AuthService {
     // MARK: - Загрузка данных из Firestore
     func loadFromCloud<T: Codable>(collection: String, type: T.Type) async throws -> T? {
         guard let db = db else {
+            print("❌ Firebase не настроен")
             throw AuthError.firebaseNotConfigured
         }
         guard let userId = currentUser?.uid else {
+            print("❌ Пользователь не авторизован")
             throw AuthError.notAuthenticated
         }
+        
+        print("📥 Загрузка из Firestore...")
+        print("   Путь: \(collection)/\(userId)")
         
         let document = try await db.collection(collection)
             .document(userId)
             .getDocument()
         
-        guard let data = document.data() else {
+        guard document.exists, let data = document.data() else {
+            print("⚠️ Документ не существует или пуст")
             return nil
         }
         
-        let jsonData = try JSONSerialization.data(withJSONObject: data)
-        let decoder = JSONDecoder()
-        return try decoder.decode(T.self, from: jsonData)
+        print("✅ Данные получены из Firestore")
+        print("📋 Ключи: \(data.keys.joined(separator: ", "))")
+        
+        let firestoreDecoder = Firestore.Decoder()
+        let decodedData = try firestoreDecoder.decode(T.self, from: data)
+        
+        print("✅ Данные декодированы")
+        return decodedData
     }
 }
 

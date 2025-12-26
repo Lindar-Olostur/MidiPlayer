@@ -5,7 +5,7 @@ enum ChartScale {
     
     var fingeringRowHeight: CGFloat {
         switch self {
-        case .portrait: 130
+        case .portrait: 135
         case .landscape: 150
         }
     }
@@ -21,7 +21,7 @@ struct FingerChartView: View {
         viewModel.sequencer.startMeasure
     }
     var endMeasure: Int {
-        viewModel.sequencer.endMeasure
+        viewModel.sequencer.endMeasure //+ 2// TODO 0
     }
     var isPlaying: Bool {
         viewModel.sequencer.isPlaying
@@ -50,7 +50,7 @@ struct FingerChartView: View {
     var body: some View {
         GeometryReader { geometry in
             let availableWidth = geometry.size.width - pianoKeyWidth
-            let baseWidth = availableWidth / CGFloat(visibleBeats)
+            let baseWidth = max(availableWidth / CGFloat(visibleBeats), 40)
             let totalContentWidth = CGFloat(visibleBeats) * baseWidth
             
             FingeringRowView(
@@ -62,7 +62,8 @@ struct FingerChartView: View {
                 totalWidth: totalContentWidth,
                 offset: 0,
                 isPlaying: isPlaying,
-                whistleKey: whistleKey
+                whistleKey: whistleKey,
+                viewWidth: availableWidth
             )
             
         }

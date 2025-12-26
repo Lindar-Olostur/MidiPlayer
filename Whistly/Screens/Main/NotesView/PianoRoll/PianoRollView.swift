@@ -19,8 +19,8 @@ struct PianoRollView: View {
     }
     
     private var pitchRange: ClosedRange<UInt8> {
-        let minP = max(0, Int(midiInfo.minPitch) - 2)
-        let maxP = min(127, Int(midiInfo.maxPitch) + 2)
+        let minP = max(0, Int(midiInfo.minPitch) + 0)//2
+        let maxP = min(127, Int(midiInfo.maxPitch) - 0)//2
         return UInt8(minP)...UInt8(maxP)
     }
     
@@ -53,7 +53,7 @@ struct PianoRollView: View {
                 )
                 .frame(width: pianoKeyWidth)
                 
-                ScrollView(.horizontal, showsIndicators: false) {
+//                ScrollView(.horizontal, showsIndicators: false) {
                     ZStack(alignment: .topLeading) {
                         GridBackground(
                             rows: totalRows,
@@ -85,8 +85,8 @@ struct PianoRollView: View {
                     }
                     .frame(width: totalContentWidth, height: totalHeight)
                     .offset(x: -min(0, maxOffset))
-                }
-                .clipped()
+//                }
+//                .clipped()
             }
         }
         .background(.fillQuartenary)

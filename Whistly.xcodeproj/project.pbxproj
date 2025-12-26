@@ -13,6 +13,7 @@
 		5D01F2552EF9B90E005B0A94 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 5D01F2542EF9B90E005B0A94 /* FirebaseAuth */; };
 		5D01F2572EF9B930005B0A94 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 5D01F2562EF9B930005B0A94 /* FirebaseFirestore */; };
 		5D01F2592EF9BB89005B0A94 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5D01F2582EF9BB89005B0A94 /* GoogleService-Info.plist */; };
+		5D25BD0B2EFF0D5D00BDD496 /* ScrollManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D25BD0A2EFF0D5D00BDD496 /* ScrollManager.swift */; };
 		5D3523B12EFACAD00069CD30 /* PositionInfoSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D3523B02EFACAD00069CD30 /* PositionInfoSectionView.swift */; };
 		5D3523B42EFACC2A0069CD30 /* TempoSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D3523B32EFACC2A0069CD30 /* TempoSectionView.swift */; };
 		5D74FB652EF154BA002DD315 /* MainContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D74FB642EF154B9002DD315 /* MainContainer.swift */; };
@@ -82,6 +83,7 @@
 		5D01F2512EF9B555005B0A94 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		5D01F2582EF9BB89005B0A94 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		5D1FB9FB2EEED5A200E13569 /* Whistly.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Whistly.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5D25BD0A2EFF0D5D00BDD496 /* ScrollManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollManager.swift; sourceTree = "<group>"; };
 		5D3523B02EFACAD00069CD30 /* PositionInfoSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionInfoSectionView.swift; sourceTree = "<group>"; };
 		5D3523B32EFACC2A0069CD30 /* TempoSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempoSectionView.swift; sourceTree = "<group>"; };
 		5D74FB642EF154B9002DD315 /* MainContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContainer.swift; sourceTree = "<group>"; };
@@ -298,6 +300,7 @@
 		5D87547C2EEED73F00972A1D /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				5D25BD0A2EFF0D5D00BDD496 /* ScrollManager.swift */,
 				5DCA56D32EF70201006D306B /* Parsers */,
 				5D74FB862EF17628002DD315 /* FingerChartStyleManager.swift */,
 				5D74FB732EF1752A002DD315 /* Sequensor */,
@@ -532,6 +535,7 @@
 				5D7EC5B42EF5BFF300226693 /* ControlButton.swift in Sources */,
 				5DDF63ED2EF07CBA00B8AB9C /* MainView.swift in Sources */,
 				5D7EC5A52EF587A100226693 /* NotesVizualizationView.swift in Sources */,
+				5D25BD0B2EFF0D5D00BDD496 /* ScrollManager.swift in Sources */,
 				5D8754962EEEDD3A00972A1D /* Image+.swift in Sources */,
 				5D8754942EEEDD3300972A1D /* ApphudProduct+.swift in Sources */,
 				5D8754B32EEEE6F500972A1D /* OnboardingView.swift in Sources */,
@@ -721,7 +725,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = LO.Whistly;
+				PRODUCT_BUNDLE_IDENTIFIER = "LO.Whistly-";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -755,7 +759,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = LO.Whistly;
+				PRODUCT_BUNDLE_IDENTIFIER = "LO.Whistly-";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

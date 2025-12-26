@@ -30,7 +30,7 @@ struct TuneManagerView: View {
                 }
             }
             ScrollView {
-            ForEach(viewModel.storage.tunesCache, id: \.id) { tune in
+            ForEach(viewModel.storage.fetchAllTunes(), id: \.id) { tune in
                 HStack(spacing: 8) {
                     Text(tune.title)
                         .lineLimit(1)

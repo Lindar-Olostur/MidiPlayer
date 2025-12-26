@@ -222,7 +222,11 @@ class MIDISequencer {
     }
     
     func loadMIDIFile(url: URL) {
-        // Очищаем ABC данные при загрузке MIDI
+        // Останавливаем воспроизведение перед загрузкой
+        stop()
+        
+        // Очищаем предыдущие данные и ресурсы
+        cleanupSequence()
         abcTunes = []
         selectedTuneIndex = 0
         
@@ -326,10 +330,15 @@ class MIDISequencer {
     }
     
     func loadABCFile(url: URL) {
-        // Очищаем MIDI данные при загрузке ABC
+        // Останавливаем воспроизведение перед загрузкой
+        stop()
+        
+        // Очищаем предыдущие данные и ресурсы
+        cleanupSequence()
         originalMIDIInfo = nil
         originalMIDIURL = nil
         midiInfo = nil
+        abcTunes = []
         
         guard let tunes = ABCParser.parseFile(url: url), !tunes.isEmpty else {
             print("Failed to parse ABC file")
@@ -444,6 +453,9 @@ class MIDISequencer {
     }
     
     private func setupSequence(_ sequence: MusicSequence) {
+        // Очищаем предыдущую последовательность перед созданием новой
+        cleanupSequence()
+        
         // Убедимся что аудио сессия активна
         #if os(iOS)
         try? AVAudioSession.sharedInstance().setActive(true)
@@ -540,6 +552,9 @@ class MIDISequencer {
     }
     
     private func cleanupSequence() {
+        // Останавливаем таймер перед очисткой
+        stopPositionTimer()
+        
         if let player = musicPlayer {
             MusicPlayerStop(player)
             DisposeMusicPlayer(player)
@@ -556,6 +571,9 @@ class MIDISequencer {
             DisposeMusicSequence(sequence)
             musicSequence = nil
         }
+        
+        // Очищаем sampler unit
+        samplerUnit = nil
     }
     
     private func updateTempo() {

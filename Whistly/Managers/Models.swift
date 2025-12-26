@@ -309,9 +309,9 @@ class WhistleConverter {
 
     func keyFinder(for whistle: WhistleKey, tune: [MIDINote]) -> [(Int, [MIDINote])] {
         var result: [(Int, [MIDINote])] = []
-//        print("Поиск возможных тональностей")
+        print("Поиск возможных тональностей")
         let whistleUniqueNotes = Set(whistle.getNotes().map { Int($0).getNoteName().dropLast() }).sorted()
-//                print("Звукоряд Вистла \(whistle): \(whistleUniqueNotes)")
+                print("Звукоряд Вистла \(whistle): \(whistleUniqueNotes)")
         for i in 0...11 {
             let tuneUniqueNotes = Set(tune.map { (Int($0.pitch) + i).getNoteName().dropLast() }).sorted()
             var tuneNotesArray = tuneUniqueNotes
@@ -336,7 +336,7 @@ class WhistleConverter {
                     )
                 }
                 result.append((i, transposedNotes))
-//                print("Звукоряд мелодии +\(i) подошел: \(scale)")
+                print("Звукоряд мелодии +\(i) подошел: \(scale)")
             }
         }
 //        let keys = result.map { KeyDetector.detectKey(from: $0) }
@@ -345,25 +345,40 @@ class WhistleConverter {
     
     func rangeFinder(for whistle: WhistleKey, tunes: [(Int, [MIDINote])]) -> [PlayableKey] {
         var result: [PlayableKey] = []
+        let pitchRange = whistle.pitchRange
+        
         for tune in tunes {
-            guard let min = tune.1.map({ $0.pitch }).min(by: { $0 < $1 }) else { break }
-            guard let max = tune.1.map({ $0.pitch }).max(by: { $0 < $1 }) else { break }
-            if min - 12 >= whistle.pitchRange.min && max - 12 <= whistle.pitchRange.max {
-                if let root = tune.1.first?.pitch {
-                    result.append(PlayableKey(keyName: KeyDetector.detectKey(from: tune.1), transpose: tune.0, rootNote: root - 12))
-                }
-            } else if min >= whistle.pitchRange.min && max <= whistle.pitchRange.max {
-                if let root = tune.1.first?.pitch {
-                    result.append(PlayableKey(keyName: KeyDetector.detectKey(from: tune.1), transpose: tune.0, rootNote: root))
-                }
-            } else if min + 12 >= whistle.pitchRange.min && max + 12 <= whistle.pitchRange.max {
-                if let root = tune.1.first?.pitch {
-                    result.append(PlayableKey(keyName: KeyDetector.detectKey(from: tune.1), transpose: tune.0, rootNote: root + 12))
+            guard let minPitch = tune.1.map({ $0.pitch }).min(),
+                  let maxPitch = tune.1.map({ $0.pitch }).max(),
+                  let root = tune.1.first?.pitch else {
+                continue
+            }
+            
+            let keyName = KeyDetector.detectKey(from: tune.1)
+            
+            for octaveShift in -2...2 {
+                let shiftedMin = Int(minPitch) + octaveShift * 12
+                let shiftedMax = Int(maxPitch) + octaveShift * 12
+                let shiftedRoot = Int(root) + octaveShift * 12
+                
+                if shiftedMin >= Int(pitchRange.min) && 
+                   shiftedMax <= Int(pitchRange.max) && 
+                   shiftedRoot >= 0 && 
+                   shiftedRoot <= 127 {
+                    let playableKey = PlayableKey(
+                        keyName: keyName,
+                        transpose: tune.0,
+                        rootNote: UInt8(shiftedRoot)
+                    )
+                    result.append(playableKey)
+                    print("  ✅ Добавлен вариант: \(keyName), transpose: \(tune.0), rootNote: \(shiftedRoot), диапазон: \(shiftedMin)-\(shiftedMax)")
+                } else {
+//                    print("  ❌ Пропущен: \(keyName), transpose: \(tune.0), octaveShift: \(octaveShift), диапазон: \(shiftedMin)-\(shiftedMax), требуется: \(pitchRange.min)-\(pitchRange.max)")
                 }
             }
         }
         
-//        print("Варианты тональностей мелодии для вистла \(whistle) - \(result.map { $0.keyName })")
+        print("Варианты тональностей мелодии для вистла \(whistle) - \(result.map { $0.keyName })")
         return result
     }
 }

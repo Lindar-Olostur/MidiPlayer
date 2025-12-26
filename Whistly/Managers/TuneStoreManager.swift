@@ -161,6 +161,9 @@ final class TuneStoreManager {
             let tempURL = FileManager.default.temporaryDirectory
                 .appendingPathComponent("\(tune.id).abc")
             
+            // Удаляем старый временный файл, если существует
+            try? FileManager.default.removeItem(at: tempURL)
+            
             do {
                 try tune.abcContent.write(to: tempURL, atomically: true, encoding: .utf8)
                 
@@ -202,6 +205,7 @@ final class TuneStoreManager {
                     
                     self.isLoading = false
                     
+                    // Удаляем временный файл после использования
                     try? FileManager.default.removeItem(at: tempURL)
                 }
             } catch {
@@ -209,6 +213,8 @@ final class TuneStoreManager {
                     self.isLoading = false
                     print("Failed to create temporary file: \(error)")
                 }
+                // Удаляем временный файл даже при ошибке
+                try? FileManager.default.removeItem(at: tempURL)
             }
         }
     }

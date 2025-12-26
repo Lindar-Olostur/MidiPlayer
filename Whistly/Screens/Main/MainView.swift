@@ -110,10 +110,10 @@ struct MainView: View {
         }
         .onAppear {
             #if DEBUG
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
-//                viewModel.sequencer.startMeasure = 1
-//                viewModel.sequencer.endMeasure = 4
-//            })
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+                viewModel.sequencer.startMeasure = 1
+                viewModel.sequencer.endMeasure = 4
+            })
             if let tune = viewModel.storage.tunesCache.first {
 //            if let testTuneURL = Bundle.main.url(forResource: "testTune", withExtension: "abc"),
 //               let tune = viewModel.storage.importFile(from: testTuneURL) {
