@@ -16,7 +16,7 @@ struct FingeringRowView: View {
     let viewWidth: CGFloat
     let beatsPerMeasure: Int
     
-    private let symbolRowHeight: CGFloat = 8
+    private let symbolRowHeight: CGFloat = 10
     private let minNoteWidth: CGFloat = 20 // Увеличим минимум
     private let targetNoteWidth: CGFloat = 40 // Целевая ширина для комфортного чтения
     
@@ -224,12 +224,10 @@ struct FingeringRowView: View {
                                 }
                             }
                         }
-                        .frame(width: viewWidth, height: rowHeight)
-                        .background(Color.fillQuartenary)
+                        .frame(width: viewWidth)
                         .id("page_\(page.pageIndex)")
                     }
                 }
-                .frame(height: rowHeight)
             }
             .onChange(of: currentBeat) { oldValue, newValue in
                 let pageSize = optimalPageSizeInBeats
@@ -325,36 +323,41 @@ struct FingeringRowView: View {
     }
 }
 
-
-//#Preview {
-//    FingeringRowView(
-//        notes: [
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 0, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 1, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 2, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 3, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 4, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 5, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 6, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 7, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 8, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 9, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 10, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 11, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 12, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 13, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 14, duration: 2, channel: 0),
-//            MIDINote(pitch: 69, velocity: 80, startBeat: 15, duration: 2, channel: 0)
-//        ],
-//        currentBeat: 1,
-//        startBeatOffset: 0,
-//        beatWidth: 40,
-//        rowHeight: 70,
-//        totalWidth: 200,
-//        offset: 0,
-//        isPlaying: false,
-//        whistleKey: .D
-//    )
-//    .frame(width: 200, height: 70)
-//    .background(Color.gray.opacity(0.1))
-//}
+#Preview {
+    let testNotes: [MIDINote] = [
+        MIDINote(pitch: 69, velocity: 80, startBeat: 0, duration: 1, channel: 0),
+        MIDINote(pitch: 71, velocity: 80, startBeat: 1, duration: 1, channel: 0),
+        MIDINote(pitch: 73, velocity: 80, startBeat: 2, duration: 1, channel: 0),
+        MIDINote(pitch: 74, velocity: 80, startBeat: 3, duration: 1, channel: 0),
+        MIDINote(pitch: 76, velocity: 80, startBeat: 4, duration: 1, channel: 0),
+        MIDINote(pitch: 78, velocity: 80, startBeat: 5, duration: 1, channel: 0),
+        MIDINote(pitch: 80, velocity: 80, startBeat: 6, duration: 1, channel: 0),
+        MIDINote(pitch: 81, velocity: 80, startBeat: 7, duration: 1, channel: 0),
+        MIDINote(pitch: 83, velocity: 80, startBeat: 8, duration: 1, channel: 0),
+        MIDINote(pitch: 85, velocity: 80, startBeat: 9, duration: 1, channel: 0),
+        MIDINote(pitch: 86, velocity: 80, startBeat: 10, duration: 1, channel: 0),
+        MIDINote(pitch: 88, velocity: 80, startBeat: 11, duration: 1, channel: 0),
+        MIDINote(pitch: 69, velocity: 80, startBeat: 12, duration: 1, channel: 0),
+        MIDINote(pitch: 71, velocity: 80, startBeat: 13, duration: 1, channel: 0),
+        MIDINote(pitch: 73, velocity: 80, startBeat: 14, duration: 1, channel: 0),
+        MIDINote(pitch: 74, velocity: 80, startBeat: 15, duration: 1, channel: 0)
+    ]
+    
+    FingeringRowView(
+        notes: testNotes,
+        currentBeat: 2.5,
+        startBeatOffset: 0,
+        beatWidth: 40,
+        rowHeight: 135,
+        totalWidth: 640,
+        offset: 0,
+        isPlaying: false,
+        whistleKey: .D,
+        viewWidth: 320,
+        beatsPerMeasure: 4
+    )
+    .frame(width: 320, height: 135)
+    .padding()
+    .background(Color.bgPrimary)
+    .environment(MainContainer())
+}

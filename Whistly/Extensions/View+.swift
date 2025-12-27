@@ -45,7 +45,7 @@ extension View {
             .contentShape(.circle)
     }
     
-    func roundCard(padding: CGFloat = 16, color: Color = .bgPrimary, radius: CGFloat = 13) -> some View {
+    func roundCard(padding: CGFloat = 16, color: Color = .fillQuartenary, radius: CGFloat = 14) -> some View {
         return self
             .padding(padding)
             .background(color)
@@ -65,7 +65,6 @@ extension View {
     } label: {
         Text("refresh")
             .padding(16)
-            .background(.red)
             .rounded()
     }
 

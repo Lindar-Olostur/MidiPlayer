@@ -5,6 +5,11 @@ struct TuneModel: Identifiable, Codable {
     let id: String
     var abcContent: String
     let dateAdded: Date
+    var dateModified: Date?
+    
+    var effectiveDateModified: Date {
+        dateModified ?? dateAdded
+    }
     
     var transpose: Int = 0
     var tempo: Double = 120
@@ -23,6 +28,7 @@ struct TuneModel: Identifiable, Codable {
     var detectedKey: String?
     
     var tuneType: TuneType = .unknown
+    var rating: Int = 0
 }
 
 @Observable
@@ -53,10 +59,16 @@ final class TuneStoreManager {
     
     func saveTune(_ tune: TuneModel) {
         var tunes = fetchAllTunes()
+        var updatedTune = tune
+        
         if let index = tunes.firstIndex(where: { $0.id == tune.id }) {
-            tunes[index] = tune
+            updatedTune.dateModified = Date()
+            tunes[index] = updatedTune
         } else {
-            tunes.append(tune)
+            if updatedTune.dateModified == nil {
+                updatedTune.dateModified = updatedTune.dateAdded
+            }
+            tunes.append(updatedTune)
         }
         saveTunes(tunes)
         tunesCache = tunes
@@ -129,10 +141,12 @@ final class TuneStoreManager {
         let title = metadata["T"]?.isEmpty == false ? metadata["T"]! : url.deletingPathExtension().lastPathComponent
         let detectedKey = metadata["K"]?.isEmpty == false ? metadata["K"] : nil
         
+        let now = Date()
         let tune = TuneModel(
             id: UUID().uuidString,
             abcContent: abcContent,
-            dateAdded: Date(),
+            dateAdded: now,
+            dateModified: now,
             title: title,
             detectedKey: detectedKey
         )

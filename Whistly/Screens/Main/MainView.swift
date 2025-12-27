@@ -40,6 +40,7 @@ struct MainView: View {
                 }
                 .disabled(viewModel.storage.loadedTune == nil)
                 Spacer()
+                
                 Menu {
 //                    Button { //TODO in settings
 //                        // TODO Auth
@@ -62,18 +63,58 @@ struct MainView: View {
                 } label: {
                     Image(systemName: "line.3.horizontal")
                         .font(.system(size: 20))
+                        .padding(8)
+                        .contentShape(.circle)
                 }
             }
             .padding(.vertical, 16)
+            
             if viewModel.storage.loadedTune != nil {
                 TuneAndWhistleSectionView()
+                NotesVizualizationView(viewMode: $viewMode)
+                MeasureSelectorView()
+                PositionInfoSectionView()
+                TempoSectionView()
+                Spacer()
+                PlaybackControlsSectionView()
+            } else {
+                Spacer()
+                VStack(spacing: 24) {
+                    Image(systemName: "music.note.list")
+                        .font(.system(size: 64))
+                        .foregroundColor(.textTertiary)
+                    
+                    VStack(spacing: 8) {
+                        Text("Нет загруженной мелодии")
+                            .font(.title2)
+                            .bold()
+                            .foregroundColor(.textPrimary)
+                        
+                        Text("Загрузите ABC файл, чтобы начать")
+                            .font(.body)
+                            .foregroundColor(.textSecondary)
+                    }
+                    
+                    Button {
+                        openTuneManager.toggle()
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "square.and.arrow.down")
+                            Text("Загрузить мелодию")
+                        }
+                        .font(.headline)
+                        .foregroundColor(.textPrimary)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(LinearGradient.primary)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                }
+                Spacer()
+                PlaybackControlsSectionView()
+                    .disabled(true)
+                    .opacity(0.5)
             }
-            NotesVizualizationView(viewMode: $viewMode)
-            MeasureSelectorView()
-            PositionInfoSectionView()
-            TempoSectionView()
-            Spacer()
-            PlaybackControlsSectionView()
         })
         .padding(.horizontal, 16)
         .background(BackgroundView())

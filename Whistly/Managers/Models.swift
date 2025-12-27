@@ -13,20 +13,19 @@ enum ViewMode: String, CaseIterable {
 }
 
 enum TuneType: String, CaseIterable, Codable {
-    case unknown = "tune"
-    case reel = "reel"
-    case jig = "jig"
-    case slip = "slip jig"
-    case hornpipe = "hornpipe"
-    case polka = "polka"
-    case slide = "slide"
-    case walz = "walz"
     case barndance = "barndance"
+    case hornpipe = "hornpipe"
+    case jig = "jig"
+    case march = "march"
+    case mazurka = "mazurka"
+    case polka = "polka"
+    case reel = "reel"
+    case slide = "slide"
+    case slip = "slip jig"
     case strathspey = "strathspey"
     case threeTwo = "three-two"
-    case mazurka = "mazurka"
-    case march = "march"
-    
+    case unknown = "tune"
+    case walz = "walz"
 }
 
 enum WhistleKey: String, CaseIterable, Codable {

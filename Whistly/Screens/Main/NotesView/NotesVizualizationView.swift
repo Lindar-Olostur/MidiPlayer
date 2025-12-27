@@ -62,8 +62,10 @@ struct NotesVizualizationView: View {
                     switch viewMode {
                     case .pianoRoll:
                         PianoRollView(midiInfo: midiInfo)
+                            .frame(height: 156)
                     case .fingerChart:
                         FingerChartView(midiInfo: midiInfo, whistleKey: viewModel.storage.loadedTune?.whistleKey ?? viewModel.userSettings.defaultWhistleKey)
+                            .frame(height: 156)
                     }
                 }
                 .frame(height: 156)

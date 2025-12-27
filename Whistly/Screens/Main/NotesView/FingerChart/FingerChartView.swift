@@ -66,7 +66,11 @@ struct FingerChartView: View {
                 viewWidth: availableWidth,
                 beatsPerMeasure: midiInfo.beatsPerMeasure
             )
+            .padding(8)
         }
+//        .frame(maxHeight: .infinity)
+        .background(Color.fillQuartenary)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 

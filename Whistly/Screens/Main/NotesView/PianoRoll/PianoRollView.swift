@@ -89,6 +89,7 @@ struct PianoRollView: View {
 //                .clipped()
             }
         }
+        .frame(maxHeight: .infinity)
         .background(.fillQuartenary)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
