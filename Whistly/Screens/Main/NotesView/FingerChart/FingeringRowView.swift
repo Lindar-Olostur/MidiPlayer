@@ -7,16 +7,18 @@ struct FingeringRowView: View {
     let notes: [MIDINote]
     let currentBeat: Double
     let startBeatOffset: Double
-    let beatWidth: CGFloat
+    let baselineBeatWidth: CGFloat
     let rowHeight: CGFloat
     let totalWidth: CGFloat
     let offset: CGFloat
     let isPlaying: Bool
     let whistleKey: WhistleKey
     let viewWidth: CGFloat
-    let scrollThreshold: CGFloat
+    let beatsPerMeasure: Int
     
     private let symbolRowHeight: CGFloat = 8
+    private let minNoteWidth: CGFloat = 20 // Увеличим минимум
+    private let targetNoteWidth: CGFloat = 40 // Целевая ширина для комфортного чтения
     
     init(
         notes: [MIDINote],
@@ -29,77 +31,236 @@ struct FingeringRowView: View {
         isPlaying: Bool,
         whistleKey: WhistleKey,
         viewWidth: CGFloat,
-        scrollThreshold: CGFloat = 1
+        beatsPerMeasure: Int
     ) {
         self.notes = notes
         self.currentBeat = currentBeat
         self.startBeatOffset = startBeatOffset
-        self.beatWidth = beatWidth
+        self.baselineBeatWidth = beatWidth
         self.rowHeight = rowHeight
         self.totalWidth = totalWidth
         self.offset = offset
         self.isPlaying = isPlaying
         self.whistleKey = whistleKey
         self.viewWidth = viewWidth
-        self.scrollThreshold = scrollThreshold
+        self.beatsPerMeasure = beatsPerMeasure
     }
     
-    // Создаем массив всех "слотов" включая пустые места между нотами
-    private var noteSlots: [(note: MIDINote?, beat: Double, width: CGFloat)] {
-        var slots: [(MIDINote?, Double, CGFloat)] = []
-        var currentBeat = startBeatOffset
-        
-        for note in notes {
-            // Добавляем пустое место до ноты если нужно
-            if note.startBeat > currentBeat {
-                let gap = note.startBeat - currentBeat
-                slots.append((nil, currentBeat, CGFloat(gap) * beatWidth))
-                currentBeat = note.startBeat
-            }
-            
-            // Добавляем саму ноту
-            let width = max(CGFloat(note.duration) * beatWidth, 40)
-            slots.append((note, note.startBeat, width))
-            currentBeat = note.endBeat
+    // Подсчитываем реальное количество слотов в диапазоне
+    private func countActualSlotsInRange(startBeat: Double, endBeat: Double) -> Int {
+        let notesInRange = notes.filter { note in
+            note.startBeat >= startBeat && note.startBeat < endBeat
         }
         
-        return slots
+        guard !notesInRange.isEmpty else { return 0 }
+        
+        var slotCount = 0
+        var currentBeat = startBeat
+        
+        for note in notesInRange {
+            if note.startBeat > currentBeat {
+                slotCount += 1 // пауза
+            }
+            slotCount += 1 // нота
+            currentBeat = min(note.endBeat, endBeat)
+        }
+        
+        if currentBeat < endBeat {
+            slotCount += 1 // пауза в конце
+        }
+        
+        return slotCount
+    }
+    
+    // Вычисляем оптимальный размер страницы
+    private var optimalPageSizeInBeats: Double {
+        let pageSizeInMeasures: [Double] = [8, 4, 2, 1, 0.5, 0.25]
+        
+        for measuresCount in pageSizeInMeasures {
+            let pageSizeInBeats = measuresCount * Double(beatsPerMeasure)
+            
+            // Проверяем количество слотов на первых страницах
+            var maxSlots = 0
+            let maxPagesToCheck = min(5, Int(ceil((notes.last?.endBeat ?? 0 - startBeatOffset) / pageSizeInBeats)))
+            
+            for pageIndex in 0..<maxPagesToCheck {
+                let pageStart = startBeatOffset + Double(pageIndex) * pageSizeInBeats
+                let pageEnd = pageStart + pageSizeInBeats
+                let slotsOnPage = countActualSlotsInRange(startBeat: pageStart, endBeat: pageEnd)
+                maxSlots = max(maxSlots, slotsOnPage)
+            }
+            
+            if maxSlots == 0 { continue }
+            
+            // Вычисляем какую ширину получит каждый слот
+            let widthPerSlot = viewWidth / CGFloat(maxSlots)
+            
+            // Проверяем что ширина >= минимальной
+            if widthPerSlot >= minNoteWidth {
+                print("✅ Selected: \(measuresCount) measures (\(pageSizeInBeats) beats)")
+                print("   Max slots: \(maxSlots), width per slot: \(widthPerSlot)")
+                return pageSizeInBeats
+            }
+            
+            print("❌ Rejected: \(measuresCount) measures - max slots: \(maxSlots), width per slot: \(widthPerSlot) < \(minNoteWidth)")
+        }
+        
+        let fallback = 0.25 * Double(beatsPerMeasure)
+        print("⚠️ Using fallback: 0.25 measures")
+        return fallback
+    }
+    
+    // Разбиваем ноты на страницы
+    private var notePages: [[MIDINote]] {
+        var pages: [[MIDINote]] = []
+        let pageSize = optimalPageSizeInBeats
+        
+        var currentPageStartBeat = startBeatOffset
+        var currentPage: [MIDINote] = []
+        
+        for note in notes {
+            let pageEnd = currentPageStartBeat + pageSize
+            
+            if note.startBeat >= currentPageStartBeat && note.startBeat < pageEnd {
+                currentPage.append(note)
+            } else if note.startBeat >= pageEnd {
+                if !currentPage.isEmpty {
+                    pages.append(currentPage)
+                }
+                
+                let pagesFromStart = floor((note.startBeat - startBeatOffset) / pageSize)
+                currentPageStartBeat = startBeatOffset + pagesFromStart * pageSize
+                currentPage = [note]
+            }
+        }
+        
+        if !currentPage.isEmpty {
+            pages.append(currentPage)
+        }
+        
+        return pages
+    }
+    
+    // Создаем слоты - распределяем ширину РАВНОМЕРНО между слотами
+    private var pages: [(pageIndex: Int, slots: [(note: MIDINote?, width: CGFloat, slotId: String)])] {
+        var result: [(Int, [(MIDINote?, CGFloat, String)])] = []
+        let pageSize = optimalPageSizeInBeats
+        
+        for (pageIndex, pageNotes) in notePages.enumerated() {
+            var slots: [(note: MIDINote?, id: String)] = []
+            
+            let pageStartBeat = startBeatOffset + Double(pageIndex) * pageSize
+            let pageEndBeat = pageStartBeat + pageSize
+            var currentBeat = pageStartBeat
+            
+            // Собираем слоты БЕЗ ширины
+            for note in pageNotes {
+                // Пауза перед нотой
+                if note.startBeat > currentBeat {
+                    slots.append((nil, "page\(pageIndex)_gap\(slots.count)"))
+                    currentBeat = note.startBeat
+                }
+                
+                // Нота
+                let noteEndOnPage = min(note.endBeat, pageEndBeat)
+                if noteEndOnPage > currentBeat {
+                    slots.append((note, "page\(pageIndex)_note\(note.id)"))
+                    currentBeat = noteEndOnPage
+                }
+                
+                if currentBeat >= pageEndBeat {
+                    break
+                }
+            }
+            
+            // Пауза в конце
+            if currentBeat < pageEndBeat && !slots.isEmpty {
+                slots.append((nil, "page\(pageIndex)_gap_end"))
+            }
+            
+            // Распределяем ширину РАВНОМЕРНО между всеми слотами
+            let slotCount = slots.count
+            guard slotCount > 0 else { continue }
+            
+            let widthPerSlot = viewWidth / CGFloat(slotCount)
+            
+            let finalSlots = slots.map { slot -> (MIDINote?, CGFloat, String) in
+                return (slot.note, widthPerSlot, slot.id)
+            }
+            
+            result.append((pageIndex, finalSlots))
+            
+            let totalWidth = finalSlots.reduce(0) { $0 + $1.1 }
+            let noteCount = finalSlots.filter { $0.0 != nil }.count
+            let gapCount = finalSlots.count - noteCount
+            print("📄 Page \(pageIndex): \(finalSlots.count) slots (\(noteCount) notes, \(gapCount) gaps)")
+            print("   Width per slot: \(widthPerSlot), total: \(totalWidth)")
+        }
+        
+        return result
     }
     
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 0) {
-                    ForEach(Array(noteSlots.enumerated()), id: \.offset) { index, slot in
-                        if let note = slot.note {
-                            FingeringImageView(
-                                note: note,
-                                width: slot.width,
-                                whistleKey: whistleKey,
-                                currentBeat: currentBeat
-                            )
-                            .frame(width: slot.width, height: rowHeight - symbolRowHeight - 2)
-                            .padding(.vertical, 8)
-                            .id("slot_\(index)")
-                        } else {
-                            Color.clear
-                                .frame(width: slot.width, height: rowHeight)
-                                .id("slot_\(index)")
+                    ForEach(pages, id: \.pageIndex) { page in
+                        HStack(spacing: 0) {
+                            ForEach(Array(page.slots.enumerated()), id: \.offset) { index, slot in
+                                if let note = slot.note {
+                                    FingeringImageView(
+                                        note: note,
+                                        width: slot.width,
+                                        whistleKey: whistleKey,
+                                        currentBeat: currentBeat
+                                    )
+                                    .frame(width: slot.width, height: rowHeight - symbolRowHeight - 2)
+                                    .padding(.vertical, 8)
+                                    .id(slot.slotId)
+                                } else {
+                                    Color.clear
+                                        .frame(width: slot.width, height: rowHeight)
+                                        .id(slot.slotId)
+                                }
+                            }
                         }
+                        .frame(width: viewWidth, height: rowHeight)
+                        .background(Color.fillQuartenary)
+                        .id("page_\(page.pageIndex)")
                     }
                 }
                 .frame(height: rowHeight)
-                .background(Color.fillQuartenary)
             }
-            .onChange(of: currentBeat) { _, newValue in
+            .onChange(of: currentBeat) { oldValue, newValue in
+                let pageSize = optimalPageSizeInBeats
+                
+                if viewModel.scrollManager.handleBeatJump(
+                    oldBeat: oldValue,
+                    newBeat: newValue,
+                    startBeatOffset: startBeatOffset,
+                    pageSize: pageSize
+                ) {
+                    viewModel.scrollManager.scrollToStart(instant: true)
+                }
+                
                 if isPlaying {
                     scrollToCurrentPosition(proxy: proxy, beat: newValue)
                 }
             }
             .onChange(of: viewModel.scrollManager.scrollToStartTrigger) { _, _ in
-                withAnimation(.easeOut(duration: 0.3)) {
-                    proxy.scrollTo("slot_0", anchor: .leading)
+                let isInstant = viewModel.scrollManager.instantScroll
+                if isInstant {
+                    proxy.scrollTo("page_0", anchor: .leading)
+                } else {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        proxy.scrollTo("page_0", anchor: .leading)
+                    }
                 }
+            }
+            .onAppear {
+                let measuresInPage = optimalPageSizeInBeats / Double(beatsPerMeasure)
+                print("📄 Final page size: \(measuresInPage) measures (\(optimalPageSizeInBeats) beats)")
+                print("📄 Total pages: \(pages.count)")
             }
         }
     }
@@ -124,80 +285,42 @@ struct FingeringRowView: View {
             }
         }
         
+        let pageSize = optimalPageSizeInBeats
+        let currentPage = Int((currentNote.startBeat - startBeatOffset) / pageSize)
         let remainingNotes = notes.count - currentNoteIndex - 1
-        let lastScrolledNoteId = viewModel.scrollManager.lastScrolledNoteId
         
-        if currentNoteIndex == 0 && lastScrolledNoteId != nil {
+        if viewModel.scrollManager.shouldScrollToStart(
+            currentPage: currentPage,
+            remainingItems: remainingNotes
+        ) {
             viewModel.scrollManager.reset()
-        }
-        
-        if remainingNotes < 1 {
-            if lastScrolledNoteId != nil {
-                viewModel.scrollManager.reset()
-                withAnimation(.easeOut(duration: 0.3)) {
-                    proxy.scrollTo("slot_0", anchor: .leading)
-                }
-            }
+            proxy.scrollTo("page_0", anchor: .leading)
             return
         }
         
-        let lastVisibleNoteIndex: Int
-        
-        if let lastScrolledId = lastScrolledNoteId,
-           let lastScrolledIndex = notes.firstIndex(where: { $0.id == lastScrolledId }),
-           let lastScrolledSlotIndex = noteSlots.firstIndex(where: { $0.note?.id == lastScrolledId }) {
-            var accumulatedWidth: CGFloat = 0
-            var foundNoteIndex = lastScrolledIndex
-            
-            for slotIndex in lastScrolledSlotIndex..<noteSlots.count {
-                let slot = noteSlots[slotIndex]
-                accumulatedWidth += slot.width
-                
-                if let note = slot.note,
-                   let noteIndex = notes.firstIndex(where: { $0.id == note.id }) {
-                    if accumulatedWidth >= viewWidth * scrollThreshold {
-                        foundNoteIndex = noteIndex
-                        break
-                    }
-                }
-            }
-            
-            lastVisibleNoteIndex = foundNoteIndex
-        } else {
-            var accumulatedWidth: CGFloat = 0
-            var foundNoteIndex = 0
-            
-            for slot in noteSlots {
-                accumulatedWidth += slot.width
-                
-                if let note = slot.note,
-                   let noteIndex = notes.firstIndex(where: { $0.id == note.id }) {
-                    if accumulatedWidth >= viewWidth * scrollThreshold {
-                        foundNoteIndex = noteIndex
-                        break
-                    }
-                }
-            }
-            
-            lastVisibleNoteIndex = foundNoteIndex
-        }
-        
-        guard currentNoteIndex >= lastVisibleNoteIndex else { return }
-        
-        if lastScrolledNoteId == currentNote.id {
+        if !viewModel.scrollManager.shouldScrollToPage(
+            currentPage: currentPage,
+            remainingItems: remainingNotes
+        ) {
             return
         }
         
-        guard let slotIndex = noteSlots.firstIndex(where: { slot in
-            slot.note?.id == currentNote.id
-        }) else { return }
+        guard currentPage < pages.count else { return }
         
-        guard slotIndex < noteSlots.count else { return }
+        if let lastScrolledId = viewModel.scrollManager.lastScrolledNoteId,
+           let lastScrolledNote = notes.first(where: { $0.id == lastScrolledId }) {
+            let lastScrolledPage = Int((lastScrolledNote.startBeat - startBeatOffset) / pageSize)
+            viewModel.scrollManager.setLastScrolledPage(lastScrolledPage)
+        }
         
         viewModel.scrollManager.setLastScrolledNoteId(currentNote.id)
+        viewModel.scrollManager.setLastScrolledPage(currentPage)
+        
+        let measuresInPage = pageSize / Double(beatsPerMeasure)
+        print("📄 Scrolling to page \(currentPage + 1)/\(pages.count) (\(measuresInPage) measures)")
         
         withAnimation(.easeOut(duration: 0.3)) {
-            proxy.scrollTo("slot_\(slotIndex)", anchor: .leading)
+            proxy.scrollTo("page_\(currentPage)", anchor: .leading)
         }
     }
 }

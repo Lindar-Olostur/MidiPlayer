@@ -21,12 +21,12 @@ struct FingerChartView: View {
         viewModel.sequencer.startMeasure
     }
     var endMeasure: Int {
-        viewModel.sequencer.endMeasure //+ 2// TODO 0
+        viewModel.sequencer.endMeasure
     }
     var isPlaying: Bool {
         viewModel.sequencer.isPlaying
     }
-    var whistleKey: WhistleKey 
+    var whistleKey: WhistleKey
     
     var mode: ChartScale = .portrait
     private let pianoKeyWidth: CGFloat = 35
@@ -63,13 +63,10 @@ struct FingerChartView: View {
                 offset: 0,
                 isPlaying: isPlaying,
                 whistleKey: whistleKey,
-                viewWidth: availableWidth
+                viewWidth: availableWidth,
+                beatsPerMeasure: midiInfo.beatsPerMeasure
             )
-            
         }
-        .frame(maxHeight: 156)
-//        .background(Color(red: 0.1, green: 0.1, blue: 0.12))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 

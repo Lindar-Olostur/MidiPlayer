@@ -7,7 +7,7 @@ struct PlaybackControlsSectionView: View {
         HStack(spacing: 25) {
             ControlButton(systemName: "backward.end.fill", size: 20) {
                 viewModel.sequencer.rewind()
-                viewModel.scrollManager.scrollToStart()
+                viewModel.scrollManager.scrollToStart(instant: true)
             }
 
             ControlButton(systemName: "stop.fill", size: 20) {
